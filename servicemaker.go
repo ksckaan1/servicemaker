@@ -30,7 +30,7 @@ func New(ctx context.Context) *ServiceMaker {
 	return sm
 }
 
-func (s *ServiceMaker) Register[T any]() {
+func (s *ServiceMaker) Register[T any]() T {
 	var c T
 
 	err := s.parseConfig(&c)
@@ -40,7 +40,7 @@ func (s *ServiceMaker) Register[T any]() {
 			"component", fmt.Sprintf("%T", c),
 			"error", err,
 		)
-		return
+		return c
 	}
 
 	compInitializer, ok := any(&c).(Initializer)
@@ -51,7 +51,7 @@ func (s *ServiceMaker) Register[T any]() {
 				s.gCtx, "error when initializing component",
 				"error", fmt.Errorf("error when initializing component: %T", compInitializer),
 			)
-			return
+			return c
 		}
 	}
 
@@ -62,6 +62,8 @@ func (s *ServiceMaker) Register[T any]() {
 		s.closers = append(s.closers, closer.Close)
 		s.closerWg.Add(1)
 	}
+
+	return c
 }
 
 func (s *ServiceMaker) Get[T any]() *T {
