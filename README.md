@@ -35,31 +35,16 @@ type HealthChecker interface {
 }
 ```
 
-## Pre-built Components
+## Getting Started
 
-ServiceMaker ships with ready-to-use components. Import them and register directly — no extra setup needed:
+ServiceMaker ships with pre-built components so you can start immediately without writing boilerplate.
 
-| Package | Description |
-|---------|-------------|
-| `github.com/ksckaan1/servicemaker/fiber` | HTTP router based on [gofiber/fiber/v3](https://gofiber.io) |
-| `github.com/ksckaan1/servicemaker/redis` | Redis client |
+### Quick Start
 
-```go
-fiber := sm.Register[fiberComp.Fiber]()
-rdb := sm.Register[redisComp.Redis]()
+```bash
+go get github.com/ksckaan1/servicemaker
+go get github.com/ksckaan1/servicemaker/components/fibercomp
 ```
-
-Each pre-built component is a standalone Go module with its own `go.mod`. Import only the ones you need.
-
-### Fiber
-
-HTTP router based on [gofiber/fiber/v3](https://gofiber.io). Configured via `FIBER_*` env vars (e.g. `FIBER_ADDR=:3000`).
-
-### Redis
-
-Redis client with per-DB connection pooling. Configured via `REDIS_*` env vars (`REDIS_ADDR`, `REDIS_USER`, `REDIS_PASS`, `REDIS_CLIENT_NAME`). Access a specific DB with `rdb.DB(n)`.
-
-## Usage
 
 ```go
 package main
@@ -69,24 +54,150 @@ import (
     "log"
 
     "github.com/ksckaan1/servicemaker"
-    fiberComp "github.com/ksckaan1/servicemaker/fiber"
+    "github.com/ksckaan1/servicemaker/components/fibercomp"
 )
 
 func main() {
     sm := servicemaker.New(context.Background())
 
-    f := sm.Register[fiberComp.Fiber]()
+    f := sm.Register[fibercomp.Fiber]()
 
     f.Router().Get("/", func(c fiber.Ctx) error {
-        return c.SendString("Hello")
+        return c.SendString("Hello, World!")
     })
 
-    err := sm.Run()
-    if err != nil {
-        log.Fatal(err)
-    }
+    log.Fatal(sm.Run())
 }
 ```
+
+```bash
+FIBER_ADDR=:3000 go run main.go
+```
+
+### Multiple Components
+
+```go
+package main
+
+import (
+    "context"
+    "log"
+
+    "github.com/ksckaan1/servicemaker"
+    "github.com/ksckaan1/servicemaker/components/fibercomp"
+    "github.com/ksckaan1/servicemaker/components/rediscomp"
+)
+
+func main() {
+    sm := servicemaker.New(context.Background())
+
+    f := sm.Register[fibercomp.Fiber]()
+    rdb := sm.Register[rediscomp.Redis]()
+
+    rdb.DB(0).Set(context.Background(), "key", "value", 0)
+
+    f.Router().Get("/", func(c fiber.Ctx) error {
+        return c.SendString("Hello, World!")
+    })
+
+    log.Fatal(sm.Run())
+}
+```
+
+```bash
+FIBER_ADDR=:3000 REDIS_ADDR=localhost:6379 go run main.go
+```
+
+## Pre-built Components
+
+Each component is a standalone Go module. Import only the ones you need.
+
+| Package | Description | Docs |
+|---------|-------------|------|
+| `components/fibercomp` | HTTP router ([gofiber/fiber/v3](https://gofiber.io)) | [README](components/fibercomp/README.md) |
+| `components/rediscomp` | Redis client ([go-redis/v9](https://github.com/redis/go-redis)) | [README](components/rediscomp/README.md) |
+
+## Custom Components
+
+To create a custom component, define a struct and implement one or more of the ServiceMaker interfaces. Configuration is parsed from environment variables using `env` struct tags.
+
+### Minimal Component (Init only)
+
+```go
+package mycomponent
+
+import "context"
+
+type Database struct {
+    DSN string `env:"MY_DB_DSN"`
+    db  *sql.DB
+}
+
+func (d *Database) Init(ctx context.Context) error {
+    var err error
+    d.db, err = sql.Open("postgres", d.DSN)
+    if err != nil {
+        return fmt.Errorf("sql.Open: %w", err)
+    }
+    return d.db.PingContext(ctx)
+}
+```
+
+```go
+db := sm.Register[mycomponent.Database]()
+```
+
+### Full Lifecycle Component
+
+```go
+package mycomponent
+
+import (
+    "context"
+    "fmt"
+    "net/http"
+)
+
+type Server struct {
+    Addr string `env:"SERVER_ADDR" envDefault:":9090"`
+    srv  *http.Server
+}
+
+func (s *Server) Init(ctx context.Context) error {
+    s.srv = &http.Server{Addr: s.Addr}
+    return nil
+}
+
+func (s *Server) Run(ctx context.Context) error {
+    <-ctx.Done()
+    return nil
+}
+
+func (s *Server) Close(ctx context.Context) error {
+    return s.srv.Shutdown(ctx)
+}
+
+func (s *Server) HealthCheck(ctx context.Context) error {
+    resp, err := http.Get("http://" + s.Addr + "/health")
+    if err != nil {
+        return err
+    }
+    resp.Body.Close()
+    if resp.StatusCode != http.StatusOK {
+        return fmt.Errorf("unhealthy: status %d", resp.StatusCode)
+    }
+    return nil
+}
+```
+
+### Config Tag Reference
+
+ServiceMaker uses [caarlos0/env](https://github.com/caarlos0/env) for parsing. Common tags:
+
+| Tag                  | Description               |
+| -------------------- | ------------------------- |
+| `env:"VAR_NAME"`     | Environment variable name |
+| `envDefault:"value"` | Default value if unset    |
 
 ## Component State Machine
 
