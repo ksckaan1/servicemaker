@@ -1,4 +1,4 @@
-module github.com/ksckaan1/servicemaker/fiber
+module github.com/ksckaan1/servicemaker/components/fibercomp
 
 go 1.27.0
 

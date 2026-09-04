@@ -1,4 +1,4 @@
-module github.com/ksckaan1/servicemaker/redis
+module github.com/ksckaan1/servicemaker/components/rediscomp
 
 go 1.26.5
 

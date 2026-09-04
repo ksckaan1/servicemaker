@@ -45,11 +45,19 @@ ServiceMaker ships with ready-to-use components. Import them and register direct
 | `github.com/ksckaan1/servicemaker/redis` | Redis client |
 
 ```go
-sm.Register[fiberComp.Fiber]()
-sm.Register[redisComp.Redis]()
+fiber := sm.Register[fiberComp.Fiber]()
+rdb := sm.Register[redisComp.Redis]()
 ```
 
 Each pre-built component is a standalone Go module with its own `go.mod`. Import only the ones you need.
+
+### Fiber
+
+HTTP router based on [gofiber/fiber/v3](https://gofiber.io). Configured via `FIBER_*` env vars (e.g. `FIBER_ADDR=:3000`).
+
+### Redis
+
+Redis client with per-DB connection pooling. Configured via `REDIS_*` env vars (`REDIS_ADDR`, `REDIS_USER`, `REDIS_PASS`, `REDIS_CLIENT_NAME`). Access a specific DB with `rdb.DB(n)`.
 
 ## Usage
 
@@ -67,10 +75,9 @@ import (
 func main() {
     sm := servicemaker.New(context.Background())
 
-    sm.Register[fiberComp.Fiber]()
+    f := sm.Register[fiberComp.Fiber]()
 
-    fiber := sm.Get[fiberComp.Fiber]()
-    fiber.Router().Get("/", func(c fiber.Ctx) error {
+    f.Router().Get("/", func(c fiber.Ctx) error {
         return c.SendString("Hello")
     })
 
