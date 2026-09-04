@@ -9,8 +9,8 @@ Go library that orchestrates service lifecycle (init, run, close, health check) 
 | Module | Path | Go version |
 |--------|------|------------|
 | `github.com/ksckaan1/servicemaker` | root | 1.27 |
-| `github.com/ksckaan1/servicemaker/fiber` | `fiber/` | 1.27.0 |
-| `github.com/ksckaan1/servicemaker/redis` | `redis/` | 1.26.5 |
+| `github.com/ksckaan1/servicemaker/components/fibercomp` | `components/fibercomp/` | 1.27.0 |
+| `github.com/ksckaan1/servicemaker/components/rediscomp` | `components/rediscomp/` | 1.26.5 |
 
 Each module has its own `go.mod` and `go.sum`. Run `go build`/`go vet` etc. from the relevant directory, not from root.
 
@@ -24,7 +24,7 @@ All component config is parsed from environment variables using `caarlos0/env/v1
 
 ## Pre-built components
 
-`fiber/` and `redis/` are ready-made components. Users can import and register them directly without writing boilerplate.
+`components/fibercomp/` and `components/rediscomp/` are ready-made components. Users can import and register them directly without writing boilerplate.
 
 ## Current state
 
