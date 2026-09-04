@@ -1,6 +1,6 @@
 module github.com/ksckaan1/servicemaker/components/rediscomp
 
-go 1.26.5
+go 1.27
 
 require (
 	github.com/ksckaan1/logger v0.2.0
