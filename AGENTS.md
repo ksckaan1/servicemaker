@@ -10,7 +10,7 @@ Go library that orchestrates service lifecycle (init, run, close, health check) 
 |--------|------|------------|
 | `github.com/ksckaan1/servicemaker` | root | 1.27 |
 | `github.com/ksckaan1/servicemaker/components/fibercomp` | `components/fibercomp/` | 1.27.0 |
-| `github.com/ksckaan1/servicemaker/components/rediscomp` | `components/rediscomp/` | 1.26.5 |
+| `github.com/ksckaan1/servicemaker/components/rediscomp` | `components/rediscomp/` | 1.27 |
 
 Each module has its own `go.mod` and `go.sum`. Run `go build`/`go vet` etc. from the relevant directory, not from root.
 
