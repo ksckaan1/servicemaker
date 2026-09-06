@@ -116,6 +116,7 @@ Each component is a standalone Go module. Import only the ones you need.
 |---------|-------------|------|
 | `components/fibercomp` | HTTP router ([gofiber/fiber/v3](https://gofiber.io)) | [README](components/fibercomp/README.md) |
 | `components/rediscomp` | Redis client ([go-redis/v9](https://github.com/redis/go-redis)) | [README](components/rediscomp/README.md) |
+| `components/pgcomp` | PostgreSQL client ([pgx/v5](https://github.com/jackc/pgx)) | [README](components/pgcomp/README.md) |
 
 ## Custom Components
 
