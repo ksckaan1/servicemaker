@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/ksckaan1/logger"
 )
 
 type Postgres struct {
@@ -25,6 +26,7 @@ func (p *Postgres) Init(ctx context.Context) error {
 
 func (p *Postgres) Close(ctx context.Context) error {
 	p.db.Close()
+	logger.Default.Info(ctx, "postgres client closed")
 
 	return nil
 }

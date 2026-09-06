@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/ksckaan1/logger"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
@@ -47,6 +48,8 @@ func (r *RabbitMQ) Close(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("conn.Close: %w", err)
 	}
+
+	logger.Default.Info(ctx, "rabbitmq client connection closed")
 
 	return nil
 }
