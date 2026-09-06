@@ -1,3 +1,7 @@
+<center>
+	<img src="./img/logo.png" alt="ServiceMaker">
+</center>
+
 # ServiceMaker
 
 A Go library that orchestrates the lifecycle of application components (init, run, close, health check). Component configuration is read from environment variables.
@@ -112,13 +116,13 @@ FIBER_ADDR=:3000 REDIS_ADDR=localhost:6379 go run main.go
 
 Each component is a standalone Go module. Import only the ones you need.
 
-| Package | Description | Docs |
-|---------|-------------|------|
-| `components/fibercomp` | HTTP router ([gofiber/fiber/v3](https://gofiber.io)) | [README](components/fibercomp/README.md) |
-| `components/rediscomp` | Redis client ([go-redis/v9](https://github.com/redis/go-redis)) | [README](components/rediscomp/README.md) |
-| `components/pgcomp` | PostgreSQL client ([pgx/v5](https://github.com/jackc/pgx)) | [README](components/pgcomp/README.md) |
+| Package                   | Description                                                            | Docs                                        |
+| ------------------------- | ---------------------------------------------------------------------- | ------------------------------------------- |
+| `components/fibercomp`    | HTTP router ([gofiber/fiber/v3](https://gofiber.io))                   | [README](components/fibercomp/README.md)    |
+| `components/rediscomp`    | Redis client ([go-redis/v9](https://github.com/redis/go-redis))        | [README](components/rediscomp/README.md)    |
+| `components/pgcomp`       | PostgreSQL client ([pgx/v5](https://github.com/jackc/pgx))             | [README](components/pgcomp/README.md)       |
 | `components/rabbitmqcomp` | RabbitMQ client ([amqp091-go](https://github.com/rabbitmq/amqp091-go)) | [README](components/rabbitmqcomp/README.md) |
-| `components/grpccomp` | gRPC server ([grpc-go](https://github.com/grpc/grpc-go)) | [README](components/grpccomp/README.md) |
+| `components/grpccomp`     | gRPC server ([grpc-go](https://github.com/grpc/grpc-go))               | [README](components/grpccomp/README.md)     |
 
 ## Custom Components
 
