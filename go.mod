@@ -6,6 +6,7 @@ require (
 	github.com/caarlos0/env/v11 v11.4.1
 	github.com/jackc/pgx/v5 v5.10.0
 	github.com/ksckaan1/logger v0.2.0
+	github.com/rabbitmq/amqp091-go v1.14.0
 	golang.org/x/sync v0.22.0
 )
 
