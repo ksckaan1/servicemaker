@@ -47,6 +47,14 @@ All configuration is read from environment variables.
 | `FIBER_STREAM_REQUEST_BODY` | `false` | Stream request body instead of buffering |
 | `FIBER_DISABLE_PRE_PARSE_MULTIPART_FORM` | `false` | Disable automatic multipart form pre-parsing |
 | `FIBER_DISABLE_STARTUP_MESSAGE` | `true` | Disable the startup log message |
+| `FIBER_USE_RECOVER_MW` | `true` | Enable panic recovery middleware |
+| `FIBER_CORS_ALLOWED_ORIGINS` | — | CORS allowed origins (comma-separated). If set, CORS middleware is enabled |
+| `FIBER_CORS_ALLOWED_METHODS` | `GET,POST,PUT,DELETE,PATCH,OPTIONS` | CORS allowed methods |
+| `FIBER_CORS_ALLOWED_HEADERS` | `Origin,Content-Type,Accept,Authorization,Cookie` | CORS allowed headers |
+| `FIBER_CORS_EXPOSE_HEADERS` | `Content-Length,Content-Type,Set-Cookie` | CORS exposed headers |
+| `FIBER_CORS_MAX_AGE` | `86400` | CORS max age in seconds |
+| `FIBER_CORS_ALLOW_CREDENTIALS` | `false` | Allow credentials in CORS |
+| `FIBER_CORS_ALLOW_PRIVATE_NETWORK` | `false` | Allow private network access |
 
 ## Interfaces
 
