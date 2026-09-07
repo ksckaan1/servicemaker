@@ -6,18 +6,16 @@ import (
 )
 
 type ServiceMaker struct {
-	comps    sync.Map // component container
-	gCtx     context.Context
-	closers  []func(context.Context) error
-	closerWg sync.WaitGroup
-	closerMu sync.Mutex
-	closed   bool
+	comps      sync.Map
+	gCtx       context.Context
+	closers    []func(context.Context) error
+	closerWg   sync.WaitGroup
+	shutdownCh chan struct{}
 }
 
 func New(ctx context.Context) *ServiceMaker {
 	sm := &ServiceMaker{
-		comps:    sync.Map{},
-		closerWg: sync.WaitGroup{},
+		shutdownCh: make(chan struct{}),
 	}
 
 	sm.gCtx = sm.gracefulShutdown(ctx)

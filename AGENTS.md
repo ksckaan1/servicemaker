@@ -26,6 +26,10 @@ All component config is parsed from environment variables using `caarlos0/env/v1
 
 `components/fibercomp/` and `components/rediscomp/` are ready-made components. Users can import and register them directly without writing boilerplate.
 
+## Workflow rules
+
+- Do NOT run `git commit` or `git push` unless explicitly asked by the user.
+
 ## Current state
 
 - No tests, no CI, no linting config, no Makefile

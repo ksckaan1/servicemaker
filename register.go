@@ -6,7 +6,7 @@ import (
 	"github.com/ksckaan1/logger"
 )
 
-func (s *ServiceMaker) Register[T any]() T {
+func (s *ServiceMaker) Register[T any]() *T {
 	var c T
 
 	err := ParseConfig(&c)
@@ -16,7 +16,7 @@ func (s *ServiceMaker) Register[T any]() T {
 			"component", fmt.Sprintf("%T", c),
 			"error", err,
 		)
-		return c
+		return &c
 	}
 
 	compInitializer, ok := any(&c).(Initializer)
@@ -27,7 +27,7 @@ func (s *ServiceMaker) Register[T any]() T {
 				s.gCtx, "error when initializing component",
 				"error", fmt.Errorf("error when initializing component (%T): %w", compInitializer, err),
 			)
-			return c
+			return &c
 		}
 	}
 
@@ -49,5 +49,5 @@ func (s *ServiceMaker) Register[T any]() T {
 		s.closerWg.Add(1)
 	}
 
-	return c
+	return &c
 }

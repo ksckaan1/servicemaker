@@ -1,8 +1,10 @@
 package servicemaker
 
 import (
+	"context"
 	"fmt"
 
+	"github.com/ksckaan1/logger"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -16,24 +18,31 @@ func (s *ServiceMaker) Run() error {
 		}
 
 		eg.Go(func() error {
-			err := compRunner.Run(ctx)
-			if err != nil {
-				return fmt.Errorf("error when running component: %w", err)
+			done := make(chan error, 1)
+			go func() {
+				done <- compRunner.Run(ctx)
+			}()
+			select {
+			case err := <-done:
+				return fmt.Errorf("(%T).Run: %w", comp, err)
+			case <-ctx.Done():
+				return ctx.Err()
 			}
-			return nil
 		})
 
 		return true
 	})
 
 	err := eg.Wait()
-	if err != nil {
-		s.closeAll()
-		s.closerWg.Wait()
-		return err
-	}
 
+	s.closeAll()
 	s.closerWg.Wait()
 
-	return nil
+	select {
+	case <-s.shutdownCh:
+		logger.Default.Info(context.Background(), "graceful shutdown completed")
+		return nil
+	default:
+		return err
+	}
 }
