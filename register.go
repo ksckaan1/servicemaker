@@ -25,7 +25,7 @@ func (s *ServiceMaker) Register[T any]() T {
 		if err != nil {
 			logger.Default.Fatal(
 				s.gCtx, "error when initializing component",
-				"error", fmt.Errorf("error when initializing component: %T", compInitializer),
+				"error", fmt.Errorf("error when initializing component (%T): %w", compInitializer, err),
 			)
 			return c
 		}

@@ -20,6 +20,7 @@ func (p *Postgres) Init(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("pgxpool.New: %w", err)
 	}
+	logger.Default.Info(ctx, "postgres client initialized")
 
 	return nil
 }

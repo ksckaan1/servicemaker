@@ -21,6 +21,8 @@ type Redis struct {
 func (r *Redis) Init(ctx context.Context) error {
 	r.conns = make(map[int]*redis.Client)
 
+	logger.Default.Info(ctx, "redis client initialized")
+
 	return nil
 }
 

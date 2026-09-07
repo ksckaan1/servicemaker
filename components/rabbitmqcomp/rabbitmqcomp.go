@@ -40,6 +40,8 @@ func (r *RabbitMQ) Init(ctx context.Context) error {
 	r.conn = conn
 	r.ch = ch
 
+	logger.Default.Info(ctx, "rabbitmq client initialized")
+
 	return nil
 }
 
