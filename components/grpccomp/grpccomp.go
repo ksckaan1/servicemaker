@@ -2,6 +2,7 @@ package grpccomp
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net"
 
@@ -52,6 +53,8 @@ func (g *GRPC) Run(ctx context.Context) error {
 		ctx, "grpc server listening",
 		"addr", g.Addr,
 	)
+
+	return errors.New("example error")
 
 	err = g.server.Serve(listener)
 	if err != nil {

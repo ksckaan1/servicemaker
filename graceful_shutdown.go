@@ -12,6 +12,7 @@ func (s *ServiceMaker) gracefulShutdown(ctx context.Context) context.Context {
 		<-gCtx.Done()
 		defer cancel()
 		s.closeAll()
+		s.closerWg.Wait()
 	}()
 	return gCtx
 }

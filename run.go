@@ -29,6 +29,7 @@ func (s *ServiceMaker) Run() error {
 	err := eg.Wait()
 	if err != nil {
 		s.closeAll()
+		s.closerWg.Wait()
 		return err
 	}
 
