@@ -42,20 +42,15 @@ func (g *GRPC) Run(ctx context.Context) error {
 	if g.Reflect {
 		reflection.Register(g.server)
 	}
+
 	listener, err := net.Listen("tcp", g.Addr)
 	if err != nil {
 		return fmt.Errorf("net.Listen: %w", err)
 	}
 
-	host, port, err := net.SplitHostPort(g.Addr)
-	if err != nil {
-		return fmt.Errorf("net.SplitHostPort: %w", err)
-	}
-
 	logger.Default.Info(
 		ctx, "grpc server listening",
-		"host", host,
-		"port", port,
+		"addr", g.Addr,
 	)
 
 	err = g.server.Serve(listener)
