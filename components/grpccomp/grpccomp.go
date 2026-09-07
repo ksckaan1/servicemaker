@@ -53,11 +53,6 @@ func (g *GRPC) Run(ctx context.Context) error {
 		"addr", g.Addr,
 	)
 
-	go func() {
-		<-ctx.Done()
-		g.server.GracefulStop()
-	}()
-
 	err = g.server.Serve(listener)
 	if err != nil {
 		return fmt.Errorf("g.server.Serve: %w", err)

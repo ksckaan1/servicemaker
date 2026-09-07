@@ -10,6 +10,8 @@ type ServiceMaker struct {
 	gCtx     context.Context
 	closers  []func(context.Context) error
 	closerWg sync.WaitGroup
+	closerMu sync.Mutex
+	closed   bool
 }
 
 func New(ctx context.Context) *ServiceMaker {
