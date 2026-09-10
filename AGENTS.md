@@ -2,7 +2,7 @@
 
 ## What this is
 
-Go library that orchestrates service lifecycle (init, run, close, health check) via env-based config. Three separate Go modules — not a workspace with replace directives.
+Go library that orchestrates service lifecycle (init, run, close, health check) via env-based config. Multiple separate Go modules — not a workspace with replace directives.
 
 ## Module structure
 
@@ -11,8 +11,12 @@ Go library that orchestrates service lifecycle (init, run, close, health check) 
 | `github.com/ksckaan1/servicemaker` | root | 1.27 |
 | `github.com/ksckaan1/servicemaker/components/fibercomp` | `components/fibercomp/` | 1.27.0 |
 | `github.com/ksckaan1/servicemaker/components/rediscomp` | `components/rediscomp/` | 1.27 |
+| `github.com/ksckaan1/servicemaker/components/grpccomp` | `components/grpccomp/` | 1.27.0 |
+| `github.com/ksckaan1/servicemaker/components/rabbitmqcomp` | `components/rabbitmqcomp/` | 1.27.0 |
+| `github.com/ksckaan1/servicemaker/components/graphqlcomp` | `components/graphqlcomp/` | 1.27.0 |
+| `github.com/ksckaan1/servicemaker/components/pgcomp` | `components/pgcomp/` | _(root module)_ |
 
-Each module has its own `go.mod` and `go.sum`. Run `go build`/`go vet` etc. from the relevant directory, not from root.
+Each module with its own `go.mod` has its own `go.sum`. Run `go build`/`go vet` etc. from the relevant directory, not from root. `pgcomp` is part of the root module (no separate `go.mod`).
 
 ## Core contracts (interface.go)
 
@@ -22,9 +26,23 @@ Components can optionally implement: `Initializer`, `Runner`, `Closer`, `HealthC
 
 All component config is parsed from environment variables using `caarlos0/env/v11`. Struct tags are `env:"VAR_NAME" envDefault:"value"`. Fatal on parse failure — no error returned to caller.
 
+## API
+
+- `Register[T any]() *T` — parses env config, calls `Init(ctx)` if implemented, registers component. Returns `*T`.
+- `Get[T any]() *T` — retrieves a registered component by type.
+- `Run()` — starts all `Runner` implementations concurrently. Returns `nil` on graceful shutdown (SIGINT/SIGKILL), or the component error otherwise.
+
+## Shutdown flow
+
+1. Signal handler listens for `SIGINT`/`SIGKILL`
+2. On signal: closes `shutdownCh`, cancels context
+3. `Run()` detects shutdown, calls `closeAll()` with `context.Background()`
+4. All `Closer` implementations are called in registration order
+5. `Run()` returns `nil` (graceful) or component error
+
 ## Pre-built components
 
-`components/fibercomp/` and `components/rediscomp/` are ready-made components. Users can import and register them directly without writing boilerplate.
+`components/fibercomp/`, `components/rediscomp/`, `components/grpccomp/`, `components/rabbitmqcomp/`, `components/graphqlcomp/` are separate modules. `components/pgcomp/` is part of the root module. Users can import and register them directly without writing boilerplate.
 
 ## Workflow rules
 
@@ -34,5 +52,3 @@ All component config is parsed from environment variables using `caarlos0/env/v1
 
 - No tests, no CI, no linting config, no Makefile
 - `example/` is gitignored
-- `redis/` module is a stub (no dependencies, no-op Init/Run)
-- No commits on master yet

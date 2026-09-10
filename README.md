@@ -15,7 +15,7 @@ An application typically consists of multiple independent components: an HTTP se
 3. **Close** — Tear down connections, release resources.
 4. **HealthCheck** — Check health status.
 
-ServiceMaker orchestrates this lifecycle from a single central point. You add components via `Register`, then start them all concurrently with `Run`. When a signal arrives (`SIGINT`/`SIGKILL`), all `Closer` implementations are called automatically in order.
+ServiceMaker orchestrates this lifecycle from a single central point. You add components via `Register`, then start them all concurrently with `Run`. When a signal arrives (`SIGINT`/`SIGKILL`), all `Closer` implementations are called automatically in order. `Run()` returns `nil` on graceful shutdown, or the component error otherwise.
 
 ## Interfaces
 
@@ -123,6 +123,7 @@ Each component is a standalone Go module. Import only the ones you need.
 | `components/pgcomp`       | PostgreSQL client ([pgx/v5](https://github.com/jackc/pgx))             | [README](components/pgcomp/README.md)       |
 | `components/rabbitmqcomp` | RabbitMQ client ([amqp091-go](https://github.com/rabbitmq/amqp091-go)) | [README](components/rabbitmqcomp/README.md) |
 | `components/grpccomp`     | gRPC server ([grpc-go](https://github.com/grpc/grpc-go))               | [README](components/grpccomp/README.md)     |
+| `components/graphqlcomp`  | GraphQL server ([gqlgen](https://github.com/99designs/gqlgen))          | [README](components/graphqlcomp/README.md)  |
 
 ## Custom Components
 
@@ -209,9 +210,10 @@ ServiceMaker uses [caarlos0/env](https://github.com/caarlos0/env) for parsing. C
 ## Component State Machine
 
 ```
-Register[T]()  → parse env config → Init(ctx) → (ready)
+Register[T]()  → parse env config → Init(ctx) → (ready)    returns *T
 Run()          → Runner.Run(ctx) concurrently (errgroup)
-SIGINT/SIGKILL → Close(ctx) in order → Run() returns
+SIGINT/SIGKILL → shutdownCh closes → Close(ctx) in order → Run() returns nil
+Component error → Close(ctx) in order → Run() returns error
 ```
 
 If a component does not implement the `Runner` interface, it is skipped during the `Run` phase. Same for `Closer` during shutdown.
