@@ -73,7 +73,7 @@ func (f *GraphQL) Init(ctx context.Context) error {
 
 	f.router.Use(f.restLoggerMW)
 
-	logger.Default.Info(ctx, "fiber initialized")
+	logger.Default.Info(ctx, "graphql initialized")
 
 	return nil
 }
@@ -81,7 +81,7 @@ func (f *GraphQL) Init(ctx context.Context) error {
 func (f *GraphQL) Run(ctx context.Context) error {
 	f.router.Hooks().OnListen(func(data fiber.ListenData) error {
 		logger.Default.Info(
-			ctx, "fiber listening",
+			ctx, "graphql listening",
 			"host", data.Host,
 			"port", data.Port,
 		)
@@ -103,7 +103,7 @@ func (f *GraphQL) Close(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("router.Shutdown: %w", err)
 	}
-	logger.Default.Info(ctx, "fiber closed")
+	logger.Default.Info(ctx, "graphql closed")
 	return nil
 }
 

@@ -42,8 +42,8 @@ func (f *GraphQL) restLoggerMW(ctx fiber.Ctx) error {
 		"response_body_length", len(ctx.Response().Body()),
 		"user_agent", ctx.Get("User-Agent"),
 		"content_type", ctx.Get("Content-Type"),
-		"api", "rest",
-		"component", "fiber",
+		"api", "graphql",
+		"component", "graphql",
 	)
 	if chainErr != nil {
 		messages = append(messages, "error", chainErr.Error())

@@ -1,3 +1,25 @@
 example/
 compose.yaml
 AGENTS.md
+docs/superpowers/
+
+# Go
+*.exe
+*.test
+*.out
+*.prof
+vendor/
+
+# Environment
+.env
+.env.*
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

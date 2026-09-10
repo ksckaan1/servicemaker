@@ -14,7 +14,7 @@ type RabbitMQ struct {
 
 	// CONFIGS
 	ConnectionString string `env:"RMQ_CONNECTION_STRING"`
-	PrefetchCount    int    `env:"RMQ_PREFETCH_COUNT" default:"1"`
+	PrefetchCount    int    `env:"RMQ_PREFETCH_COUNT" envDefault:"1"`
 }
 
 func (r *RabbitMQ) Init(ctx context.Context) error {

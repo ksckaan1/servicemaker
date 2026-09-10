@@ -15,7 +15,7 @@ An application typically consists of multiple independent components: an HTTP se
 3. **Close** — Tear down connections, release resources.
 4. **HealthCheck** — Check health status.
 
-ServiceMaker orchestrates this lifecycle from a single central point. You add components via `Register`, then start them all concurrently with `Run`. When a signal arrives (`SIGINT`/`SIGKILL`), all `Closer` implementations are called automatically in order. `Run()` returns `nil` on graceful shutdown, or the component error otherwise.
+ServiceMaker orchestrates this lifecycle from a single central point. You add components via `Register`, then start them all concurrently with `Run`. When a signal arrives (`SIGINT`/`SIGTERM`), all `Closer` implementations are called automatically in order. `Run()` returns `nil` on graceful shutdown, or the component error otherwise.
 
 ## Interfaces
 
@@ -212,7 +212,7 @@ ServiceMaker uses [caarlos0/env](https://github.com/caarlos0/env) for parsing. C
 ```
 Register[T]()  → parse env config → Init(ctx) → (ready)    returns *T
 Run()          → Runner.Run(ctx) concurrently (errgroup)
-SIGINT/SIGKILL → shutdownCh closes → Close(ctx) in order → Run() returns nil
+SIGINT/SIGTERM → shutdownCh closes → Close(ctx) in order → Run() returns nil
 Component error → Close(ctx) in order → Run() returns error
 ```
 

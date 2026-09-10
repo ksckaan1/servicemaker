@@ -30,11 +30,11 @@ All component config is parsed from environment variables using `caarlos0/env/v1
 
 - `Register[T any]() *T` — parses env config, calls `Init(ctx)` if implemented, registers component. Returns `*T`.
 - `Get[T any]() *T` — retrieves a registered component by type.
-- `Run()` — starts all `Runner` implementations concurrently. Returns `nil` on graceful shutdown (SIGINT/SIGKILL), or the component error otherwise.
+- `Run()` — starts all `Runner` implementations concurrently. Returns `nil` on graceful shutdown (SIGINT/SIGTERM), or the component error otherwise.
 
 ## Shutdown flow
 
-1. Signal handler listens for `SIGINT`/`SIGKILL`
+1. Signal handler listens for `SIGINT`/`SIGTERM`
 2. On signal: closes `shutdownCh`, cancels context
 3. `Run()` detects shutdown, calls `closeAll()` with `context.Background()`
 4. All `Closer` implementations are called in registration order

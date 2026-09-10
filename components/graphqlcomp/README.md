@@ -60,6 +60,7 @@ All configuration is read from environment variables.
 | `GQL_CORS_EXPOSE_HEADERS` | `Content-Length,Content-Type,Set-Cookie` | CORS exposed headers |
 | `GQL_CORS_MAX_AGE` | `86400` | CORS max age in seconds |
 | `GQL_CORS_ALLOW_CREDENTIALS` | `false` | Allow credentials in CORS |
+| `GQL_CORS_DISABLE_VALUE_REDUCTION` | `false` | Disable CORS value redaction |
 | `GQL_CORS_ALLOW_PRIVATE_NETWORK` | `false` | Allow private network access |
 
 ## Interfaces

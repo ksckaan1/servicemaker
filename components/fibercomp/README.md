@@ -54,6 +54,7 @@ All configuration is read from environment variables.
 | `FIBER_CORS_EXPOSE_HEADERS` | `Content-Length,Content-Type,Set-Cookie` | CORS exposed headers |
 | `FIBER_CORS_MAX_AGE` | `86400` | CORS max age in seconds |
 | `FIBER_CORS_ALLOW_CREDENTIALS` | `false` | Allow credentials in CORS |
+| `FIBER_CORS_DISABLE_VALUE_REDUCTION` | `false` | Disable CORS value redaction |
 | `FIBER_CORS_ALLOW_PRIVATE_NETWORK` | `false` | Allow private network access |
 
 ## Interfaces
