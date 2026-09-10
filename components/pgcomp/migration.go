@@ -11,7 +11,7 @@ import (
 	"github.com/ksckaan1/logger"
 )
 
-func (p *Postgres) MigratePostgres(ctx context.Context, fsys fs.FS, path string) error {
+func (p *Postgres) Migrate(ctx context.Context, fsys fs.FS, path string) error {
 	efs, err := iofs.New(fsys, path)
 	if err != nil {
 		return fmt.Errorf("iofs.New: %w", err)
