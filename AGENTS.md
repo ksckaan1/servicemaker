@@ -14,6 +14,7 @@ Go library that orchestrates service lifecycle (init, run, close, health check) 
 | `github.com/ksckaan1/servicemaker/components/grpccomp` | `components/grpccomp/` | 1.27.0 |
 | `github.com/ksckaan1/servicemaker/components/rabbitmqcomp` | `components/rabbitmqcomp/` | 1.27.0 |
 | `github.com/ksckaan1/servicemaker/components/graphqlcomp` | `components/graphqlcomp/` | 1.27.0 |
+| `github.com/ksckaan1/servicemaker/components/meilisearchcomp` | `components/meilisearchcomp/` | 1.27.0 |
 | `github.com/ksckaan1/servicemaker/components/pgcomp` | `components/pgcomp/` | 1.27.0 |
 
 Each module with its own `go.mod` has its own `go.sum`. Run `go build`/`go vet` etc. from the relevant directory, not from root.
@@ -42,7 +43,7 @@ All component config is parsed from environment variables using `caarlos0/env/v1
 
 ## Pre-built components
 
-`components/fibercomp/`, `components/rediscomp/`, `components/grpccomp/`, `components/rabbitmqcomp/`, `components/graphqlcomp/`, `components/pgcomp/` are separate modules. Users can import and register them directly without writing boilerplate.
+`components/fibercomp/`, `components/rediscomp/`, `components/grpccomp/`, `components/rabbitmqcomp/`, `components/graphqlcomp/`, `components/meilisearchcomp/`, `components/pgcomp/` are separate modules. Users can import and register them directly without writing boilerplate.
 
 ## Workflow rules
 

@@ -124,6 +124,7 @@ Each component is a standalone Go module. Import only the ones you need.
 | `components/rabbitmqcomp` | RabbitMQ client ([amqp091-go](https://github.com/rabbitmq/amqp091-go)) | [README](components/rabbitmqcomp/README.md) |
 | `components/grpccomp`     | gRPC server ([grpc-go](https://github.com/grpc/grpc-go))               | [README](components/grpccomp/README.md)     |
 | `components/graphqlcomp`  | GraphQL server ([gqlgen](https://github.com/99designs/gqlgen))          | [README](components/graphqlcomp/README.md)  |
+| `components/meilisearchcomp` | MeiliSearch client ([meilisearch-go](https://github.com/meilisearch/meilisearch-go)) | [README](components/meilisearchcomp/README.md) |
 
 ## Custom Components
 
