@@ -45,7 +45,7 @@ All configuration is read from environment variables.
 
 | Env Variable | Default | Description |
 |-------------|---------|-------------|
-| `REDIS_ADDR` | — | Redis server address (e.g. `localhost:6379`) |
+| `REDIS_ADDR` | **required** | Redis server address (e.g. `localhost:6379`) |
 | `REDIS_USER` | — | Username |
 | `REDIS_PASS` | — | Password |
 | `REDIS_CLIENT_NAME` | — | Client name sent via `CLIENT SETNAME` |

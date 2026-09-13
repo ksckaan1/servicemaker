@@ -46,7 +46,7 @@ RMQ_CONNECTION_STRING=amqp://guest:guest@localhost:5672/ go run main.go
 
 | Env Variable | Default | Description |
 |-------------|---------|-------------|
-| `RMQ_CONNECTION_STRING` | — | AMQP connection URL |
+| `RMQ_CONNECTION_STRING` | **required** | AMQP connection URL |
 | `RMQ_PREFETCH_COUNT` | `1` | QoS prefetch count |
 
 ## Interfaces

@@ -45,7 +45,7 @@ PG_DB_URL=postgres://user:pass@localhost:5432/mydb go run main.go
 
 | Env Variable | Default | Description |
 |-------------|---------|-------------|
-| `PG_DB_URL` | — | PostgreSQL connection URL (e.g. `postgres://user:pass@localhost:5432/dbname`) |
+| `PG_DB_URL` | **required** | PostgreSQL connection URL (e.g. `postgres://user:pass@localhost:5432/dbname`) |
 
 ## Interfaces
 

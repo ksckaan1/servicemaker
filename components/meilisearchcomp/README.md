@@ -49,7 +49,7 @@ All configuration is read from environment variables.
 
 | Env Variable | Default | Description |
 |-------------|---------|-------------|
-| `MS_HOST` | — | MeiliSearch server address (e.g. `http://localhost:7700`) |
+| `MS_HOST` | **required** | MeiliSearch server address (e.g. `http://localhost:7700`) |
 | `MS_API_KEY` | — | API key (optional, omitted if empty) |
 
 ## Interfaces

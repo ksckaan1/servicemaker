@@ -40,7 +40,7 @@ GRPC_ADDR=:50051 go run main.go
 
 | Env Variable | Default | Description |
 |-------------|---------|-------------|
-| `GRPC_ADDR` | — | Listen address (e.g. `:50051`) |
+| `GRPC_ADDR` | **required** | Listen address (e.g. `:50051`) |
 | `GRPC_REFLECT` | `true` | Enable gRPC server reflection |
 
 ## Interfaces
