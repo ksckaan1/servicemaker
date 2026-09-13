@@ -26,28 +26,6 @@ ServiceMaker orchestrates this lifecycle from a single central point. You add co
 - `Run()` — starts all `Runner` implementations concurrently. Returns `nil` on graceful shutdown (SIGINT/SIGTERM), or the component error otherwise.
 - `RegisterGracefulShutdown(closer func(context.Context) error)` — registers a custom cleanup function to run during shutdown.
 
-## Interfaces
-
-A component only implements the interfaces for the stages it participates in — it does not need to implement all of them:
-
-```go
-type Initializer interface {
-    Init(ctx context.Context) error
-}
-
-type Runner interface {
-    Run(ctx context.Context) error
-}
-
-type Closer interface {
-    Close(ctx context.Context) error
-}
-
-type HealthChecker interface {
-    HealthCheck(ctx context.Context) error
-}
-```
-
 ## Getting Started
 
 ServiceMaker ships with pre-built components so you can start immediately without writing boilerplate.
@@ -172,6 +150,28 @@ Each component is a standalone Go module. Import only the ones you need.
 ## Custom Components
 
 To create a custom component, define a struct and implement one or more of the ServiceMaker interfaces. Configuration is parsed from environment variables using `env` struct tags.
+
+### Interfaces
+
+A component only implements the interfaces for the stages it participates in — it does not need to implement all of them:
+
+```go
+type Initializer interface {
+    Init(ctx context.Context) error
+}
+
+type Runner interface {
+    Run(ctx context.Context) error
+}
+
+type Closer interface {
+    Close(ctx context.Context) error
+}
+
+type HealthChecker interface {
+    HealthCheck(ctx context.Context) error
+}
+```
 
 ### Minimal Component (Init only)
 
