@@ -142,9 +142,6 @@ func main() {
     cache := sm.RegisterNamed[rediscomp.Redis]("cache")
     queue := sm.RegisterNamed[rediscomp.Redis]("queue")
 
-    cache.DB(0).Set(context.Background(), "cache:key", "value", 0)
-    queue.DB(0).Set(context.Background(), "queue:task", "data", 0)
-
     // Retrieve by name later
     c := sm.GetNamed[rediscomp.Redis]("cache")
 
