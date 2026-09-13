@@ -121,6 +121,43 @@ func main() {
 FIBER_ADDR=:3000 REDIS_ADDR=localhost:6379 go run main.go
 ```
 
+### Named Components
+
+Use `RegisterNamed` to create multiple instances of the same component type with separate env var prefixes.
+
+```go
+package main
+
+import (
+    "context"
+    "log"
+
+    "github.com/ksckaan1/servicemaker"
+    "github.com/ksckaan1/servicemaker/components/rediscomp"
+)
+
+func main() {
+    sm := servicemaker.New(context.Background())
+
+    cache := sm.RegisterNamed[rediscomp.Redis]("cache")
+    queue := sm.RegisterNamed[rediscomp.Redis]("queue")
+
+    cache.DB(0).Set(context.Background(), "cache:key", "value", 0)
+    queue.DB(0).Set(context.Background(), "queue:task", "data", 0)
+
+    // Retrieve by name later
+    c := sm.GetNamed[rediscomp.Redis]("cache")
+
+    log.Fatal(sm.Run())
+}
+```
+
+```bash
+CACHE_REDIS_ADDR=localhost:6379 QUEUE_REDIS_ADDR=localhost:6380 go run main.go
+```
+
+`RegisterNamed[T]("cache")` prefixes all env vars with `CACHE_` (uppercased). So `REDIS_ADDR` becomes `CACHE_REDIS_ADDR`. `GetNamed` retrieves the instance by name.
+
 ## Pre-built Components
 
 Each component is a standalone Go module. Import only the ones you need.
