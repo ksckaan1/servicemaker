@@ -17,6 +17,15 @@ An application typically consists of multiple independent components: an HTTP se
 
 ServiceMaker orchestrates this lifecycle from a single central point. You add components via `Register`, then start them all concurrently with `Run`. When a signal arrives (`SIGINT`/`SIGTERM`), all `Closer` implementations are called automatically in order. `Run()` returns `nil` on graceful shutdown, or the component error otherwise.
 
+## API
+
+- `Register[T any]() *T` — parses env config, calls `Init(ctx)` if implemented, registers component. Returns `*T`.
+- `RegisterNamed[T any](name string) *T` — same as `Register`, but prefixes env vars with `NAME_` and uses a namespaced key. Allows multiple instances of the same component type.
+- `Get[T any]() *T` — retrieves a registered component by type.
+- `GetNamed[T any](name string) *T` — retrieves a named component by type and name.
+- `Run()` — starts all `Runner` implementations concurrently. Returns `nil` on graceful shutdown (SIGINT/SIGTERM), or the component error otherwise.
+- `RegisterGracefulShutdown(closer func(context.Context) error)` — registers a custom cleanup function to run during shutdown.
+
 ## Interfaces
 
 A component only implements the interfaces for the stages it participates in — it does not need to implement all of them:
@@ -207,6 +216,7 @@ ServiceMaker uses [caarlos0/env](https://github.com/caarlos0/env) for parsing. C
 | -------------------- | ------------------------- |
 | `env:"VAR_NAME"`     | Environment variable name |
 | `envDefault:"value"` | Default value if unset    |
+| `env:",required"`    | Required — fatal if unset |
 
 ## Component State Machine
 

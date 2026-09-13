@@ -20,7 +20,7 @@ type Fiber struct {
 	Concurrency                  int      `env:"FIBER_CONCURRENCY" envDefault:"0"`
 	StreamRequestBody            bool     `env:"FIBER_STREAM_REQUEST_BODY" envDefault:"false"`
 	DisablePreParseMultipartForm bool     `env:"FIBER_DISABLE_PRE_PARSE_MULTIPART_FORM" envDefault:"false"`
-	Addr                         string   `env:"FIBER_ADDR" envDefault:":8080"`
+	Addr                         string   `env:"FIBER_ADDR,required"`
 	DisableStartupMessage        bool     `env:"FIBER_DISABLE_STARTUP_MESSAGE" envDefault:"true"`
 	UseRecoverMW                 bool     `env:"FIBER_USE_RECOVER_MW" envDefault:"true"`
 	CORSAllowedOrigins           []string `env:"FIBER_CORS_ALLOWED_ORIGINS"`

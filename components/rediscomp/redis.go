@@ -12,7 +12,7 @@ type Redis struct {
 	conns map[int]*redis.Client
 
 	// CONFIGS
-	Addr       string `env:"REDIS_ADDR"`
+	Addr       string `env:"REDIS_ADDR,required"`
 	User       string `env:"REDIS_USER"`
 	Pass       string `env:"REDIS_PASS"`
 	ClientName string `env:"REDIS_CLIENT_NAME"`

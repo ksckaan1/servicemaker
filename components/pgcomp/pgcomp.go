@@ -9,7 +9,7 @@ import (
 )
 
 type Postgres struct {
-	DBURL string `env:"PG_DB_URL"`
+	DBURL string `env:"PG_DB_URL,required"`
 	db    *pgxpool.Pool
 }
 

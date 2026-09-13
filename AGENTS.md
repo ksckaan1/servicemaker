@@ -30,8 +30,11 @@ All component config is parsed from environment variables using `caarlos0/env/v1
 ## API
 
 - `Register[T any]() *T` — parses env config, calls `Init(ctx)` if implemented, registers component. Returns `*T`.
+- `RegisterNamed[T any](name string) *T` — same as `Register`, but prefixes env vars with `NAME_` and uses a namespaced key.
 - `Get[T any]() *T` — retrieves a registered component by type.
+- `GetNamed[T any](name string) *T` — retrieves a named component by type and name.
 - `Run()` — starts all `Runner` implementations concurrently. Returns `nil` on graceful shutdown (SIGINT/SIGTERM), or the component error otherwise.
+- `RegisterGracefulShutdown(closer func(context.Context) error)` — registers a custom cleanup function to run during shutdown.
 
 ## Shutdown flow
 

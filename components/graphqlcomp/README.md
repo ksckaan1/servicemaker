@@ -44,7 +44,7 @@ All configuration is read from environment variables.
 
 | Env Variable | Default | Description |
 |-------------|---------|-------------|
-| `GQL_ADDR` | `:8080` | Listen address |
+| `GQL_ADDR` | **required** | Listen address (e.g. `:8080`) |
 | `GQL_BODY_LIMIT` | `0` | Max body size in bytes (`0` = unlimited) |
 | `GQL_MAX_RANGES` | `0` | Max number of range requests (`0` = unlimited) |
 | `GQL_CONCURRENCY` | `0` | Max concurrent connections (`0` = unlimited) |

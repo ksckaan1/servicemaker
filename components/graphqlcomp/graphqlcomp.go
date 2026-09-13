@@ -24,7 +24,7 @@ type GraphQL struct {
 	Concurrency                  int      `env:"GQL_CONCURRENCY" envDefault:"0"`
 	StreamRequestBody            bool     `env:"GQL_STREAM_REQUEST_BODY" envDefault:"false"`
 	DisablePreParseMultipartForm bool     `env:"GQL_DISABLE_PRE_PARSE_MULTIPART_FORM" envDefault:"false"`
-	Addr                         string   `env:"GQL_ADDR" envDefault:":8080"`
+	Addr                         string   `env:"GQL_ADDR,required"`
 	DisableStartupMessage        bool     `env:"GQL_DISABLE_STARTUP_MESSAGE" envDefault:"true"`
 	UseRecoverMW                 bool     `env:"GQL_USE_RECOVER_MW" envDefault:"true"`
 	CORSAllowedOrigins           []string `env:"GQL_CORS_ALLOWED_ORIGINS"`

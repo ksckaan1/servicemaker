@@ -40,7 +40,7 @@ All configuration is read from environment variables.
 
 | Env Variable | Default | Description |
 |-------------|---------|-------------|
-| `FIBER_ADDR` | `:8080` | Listen address |
+| `FIBER_ADDR` | **required** | Listen address (e.g. `:8080`) |
 | `FIBER_BODY_LIMIT` | `0` | Max body size in bytes (`0` = unlimited) |
 | `FIBER_MAX_RANGES` | `0` | Max number of range requests (`0` = unlimited) |
 | `FIBER_CONCURRENCY` | `0` | Max concurrent connections (`0` = unlimited) |

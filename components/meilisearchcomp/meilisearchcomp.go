@@ -10,7 +10,7 @@ import (
 type MeiliSearch struct {
 	sm meilisearch.ServiceManager
 
-	Host   string `env:"MS_HOST"`
+	Host   string `env:"MS_HOST,required"`
 	APIKey string `env:"MS_API_KEY"`
 }
 

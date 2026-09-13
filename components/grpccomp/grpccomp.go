@@ -18,7 +18,7 @@ type GRPC struct {
 	streamServerInterceptors []grpc.StreamServerInterceptor
 
 	// CONFIGS
-	Addr    string `env:"GRPC_ADDR"`
+	Addr    string `env:"GRPC_ADDR,required"`
 	Reflect bool   `env:"GRPC_REFLECT" envDefault:"true"`
 }
 

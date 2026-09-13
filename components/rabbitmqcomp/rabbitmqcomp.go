@@ -13,7 +13,7 @@ type RabbitMQ struct {
 	ch   *amqp.Channel
 
 	// CONFIGS
-	ConnectionString string `env:"RMQ_CONNECTION_STRING"`
+	ConnectionString string `env:"RMQ_CONNECTION_STRING,required"`
 	PrefetchCount    int    `env:"RMQ_PREFETCH_COUNT" envDefault:"1"`
 }
 
