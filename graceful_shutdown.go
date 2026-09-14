@@ -20,4 +20,5 @@ func (s *ServiceMaker) gracefulShutdown(ctx context.Context) context.Context {
 
 func (s *ServiceMaker) RegisterGracefulShutdown(closer func(context.Context) error) {
 	s.closers = append(s.closers, closer)
+	s.closerWg.Add(1)
 }
