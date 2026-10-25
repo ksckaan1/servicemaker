@@ -84,3 +84,43 @@ func restoreTransport(t *testing.T) {
 	orig := http.DefaultTransport
 	t.Cleanup(func() { http.DefaultTransport = orig })
 }
+
+// Verifies that documented OTEL_TRACES_SAMPLER values are honoured by the SDK.
+func TestSamplerEnvIsHonoured(t *testing.T) {
+	restoreTransport(t)
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer srv.Close()
+
+	t.Setenv("OTEL_EXPORTER_OTLP_ENDPOINT", srv.URL)
+	t.Setenv("OTEL_SERVICE_NAME", "otelcomp-test")
+
+	for _, tc := range []struct {
+		sampler     string
+		wantSampled bool
+	}{
+		{sampler: "always_off", wantSampled: false},
+		{sampler: "always_on", wantSampled: true},
+	} {
+		t.Setenv("OTEL_TRACES_SAMPLER", tc.sampler)
+
+		o := &Otel{}
+		if err := o.Init(context.Background()); err != nil {
+			t.Fatalf("Init(%s): %v", tc.sampler, err)
+		}
+
+		_, span := otel.Tracer("test").Start(context.Background(), "span")
+		sampled := span.SpanContext().IsSampled()
+		span.End()
+
+		if sampled != tc.wantSampled {
+			t.Fatalf("OTEL_TRACES_SAMPLER=%s: sampled=%v, want %v", tc.sampler, sampled, tc.wantSampled)
+		}
+
+		if err := o.Close(context.Background()); err != nil {
+			t.Fatalf("Close: %v", err)
+		}
+	}
+}
