@@ -5,7 +5,7 @@ go 1.27.0
 require (
 	github.com/gofiber/contrib/v3/otel v1.3.1
 	github.com/gofiber/fiber/v3 v3.6.1
-	github.com/ksckaan1/logger v0.2.0
+	github.com/ksckaan1/logger v0.4.0
 )
 
 require (

@@ -2,11 +2,16 @@ package otelcomp
 
 import (
 	"context"
+	"io"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/log"
+	"go.opentelemetry.io/otel/log/global"
 )
 
 // Verifies that Close flushes spans that are still buffered in the batch
@@ -75,6 +80,58 @@ func TestDefaultTransportIsTraced(t *testing.T) {
 
 	if traceparent == "" {
 		t.Fatal("traceparent header was not injected by the default transport")
+	}
+}
+
+// Verifies that logs emitted through the global logger provider are buffered
+// and flushed to the OTLP endpoint on Close, and that they carry the resource.
+func TestCloseFlushesBufferedLogs(t *testing.T) {
+	restoreTransport(t)
+
+	bodies := make(chan string, 8)
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		body, _ := io.ReadAll(r.Body)
+		if r.URL.Path == "/v1/logs" {
+			bodies <- string(body)
+		}
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer srv.Close()
+
+	t.Setenv("OTEL_EXPORTER_OTLP_ENDPOINT", srv.URL)
+	t.Setenv("OTEL_SERVICE_NAME", "otelcomp-logs-test")
+
+	o := &Otel{}
+	if err := o.Init(context.Background()); err != nil {
+		t.Fatalf("Init: %v", err)
+	}
+
+	logger := global.GetLoggerProvider().Logger("test")
+	var r log.Record
+	r.SetBody(attribute.StringValue("log-from-test"))
+	logger.Emit(context.Background(), r)
+
+	select {
+	case <-bodies:
+		t.Fatal("log exported before Close")
+	default:
+	}
+
+	if err := o.Close(context.Background()); err != nil {
+		t.Fatalf("Close: %v", err)
+	}
+
+	select {
+	case body := <-bodies:
+		if !strings.Contains(body, "log-from-test") {
+			t.Fatalf("exported log does not contain the body: %q", body)
+		}
+		if !strings.Contains(body, "otelcomp-logs-test") {
+			t.Fatalf("exported log does not contain the service name: %q", body)
+		}
+	default:
+		t.Fatal("Close did not flush buffered logs")
 	}
 }
 

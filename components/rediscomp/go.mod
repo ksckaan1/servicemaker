@@ -3,7 +3,7 @@ module github.com/ksckaan1/servicemaker/components/rediscomp
 go 1.27.0
 
 require (
-	github.com/ksckaan1/logger v0.2.0
+	github.com/ksckaan1/logger v0.4.0
 	github.com/redis/go-redis/extra/redisotel/v9 v9.23.0
 	github.com/redis/go-redis/v9 v9.23.0
 	go.opentelemetry.io/otel v1.47.0

@@ -3,7 +3,7 @@ module github.com/ksckaan1/servicemaker/components/grpccomp
 go 1.27.0
 
 require (
-	github.com/ksckaan1/logger v0.2.0
+	github.com/ksckaan1/logger v0.4.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.72.0
 	google.golang.org/grpc v1.84.0
 )

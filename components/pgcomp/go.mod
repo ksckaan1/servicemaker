@@ -6,7 +6,7 @@ require (
 	github.com/exaring/otelpgx v0.13.0
 	github.com/golang-migrate/migrate/v4 v4.20.1
 	github.com/jackc/pgx/v5 v5.11.0
-	github.com/ksckaan1/logger v0.2.0
+	github.com/ksckaan1/logger v0.4.0
 )
 
 require (

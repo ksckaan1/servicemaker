@@ -6,7 +6,7 @@ require (
 	github.com/99designs/gqlgen v0.17.98
 	github.com/gofiber/contrib/v3/otel v1.3.1
 	github.com/gofiber/fiber/v3 v3.6.1
-	github.com/ksckaan1/logger v0.2.0
+	github.com/ksckaan1/logger v0.4.0
 	go.opentelemetry.io/otel v1.47.0
 	go.opentelemetry.io/otel/sdk v1.47.0
 )
