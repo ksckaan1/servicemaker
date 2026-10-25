@@ -146,6 +146,7 @@ Each component is a standalone Go module. Import only the ones you need.
 | `components/grpccomp`     | gRPC server ([grpc-go](https://github.com/grpc/grpc-go))               | [README](components/grpccomp/README.md)     |
 | `components/graphqlcomp`  | GraphQL server ([gqlgen](https://github.com/99designs/gqlgen))          | [README](components/graphqlcomp/README.md)  |
 | `components/meilisearchcomp` | MeiliSearch client ([meilisearch-go](https://github.com/meilisearch/meilisearch-go)) | [README](components/meilisearchcomp/README.md) |
+| `components/otelcomp`     | OpenTelemetry tracing ([OTLP](https://opentelemetry.io))               | [README](components/otelcomp/README.md)     |
 
 ## Custom Components
 

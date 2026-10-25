@@ -62,6 +62,7 @@ All configuration is read from environment variables.
 | `GQL_CORS_ALLOW_CREDENTIALS` | `false` | Allow credentials in CORS |
 | `GQL_CORS_DISABLE_VALUE_REDUCTION` | `false` | Disable CORS value redaction |
 | `GQL_CORS_ALLOW_PRIVATE_NETWORK` | `false` | Allow private network access |
+| `GQL_OTEL_SKIP_PATHS` | `/health,/healthz` | Paths excluded from tracing |
 
 ## Interfaces
 

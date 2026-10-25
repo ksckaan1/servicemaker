@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/exaring/otelpgx"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/ksckaan1/logger"
 )
@@ -14,12 +15,23 @@ type Postgres struct {
 }
 
 func (p *Postgres) Init(ctx context.Context) error {
-	var err error
-
-	p.db, err = pgxpool.New(ctx, p.DBURL)
+	cfg, err := pgxpool.ParseConfig(p.DBURL)
 	if err != nil {
-		return fmt.Errorf("pgxpool.New: %w", err)
+		return fmt.Errorf("pgxpool.ParseConfig: %w", err)
 	}
+
+	cfg.ConnConfig.Tracer = otelpgx.NewTracer()
+
+	p.db, err = pgxpool.NewWithConfig(ctx, cfg)
+	if err != nil {
+		return fmt.Errorf("pgxpool.NewWithConfig: %w", err)
+	}
+
+	err = otelpgx.RecordStats(p.db)
+	if err != nil {
+		return fmt.Errorf("otelpgx.RecordStats: %w", err)
+	}
+
 	logger.Default.Info(ctx, "postgres client initialized")
 
 	return nil

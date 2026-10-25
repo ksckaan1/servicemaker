@@ -56,6 +56,7 @@ All configuration is read from environment variables.
 | `FIBER_CORS_ALLOW_CREDENTIALS` | `false` | Allow credentials in CORS |
 | `FIBER_CORS_DISABLE_VALUE_REDUCTION` | `false` | Disable CORS value redaction |
 | `FIBER_CORS_ALLOW_PRIVATE_NETWORK` | `false` | Allow private network access |
+| `FIBER_OTEL_SKIP_PATHS` | `/health,/healthz` | Paths excluded from tracing |
 
 ## Interfaces
 

@@ -5,7 +5,9 @@ import (
 	"fmt"
 
 	"github.com/ksckaan1/logger"
+	"github.com/redis/go-redis/extra/redisotel/v9"
 	"github.com/redis/go-redis/v9"
+	"go.opentelemetry.io/otel/attribute"
 )
 
 type Redis struct {
@@ -65,6 +67,19 @@ func (r *Redis) DB(db int) *redis.Client {
 			DB:         db,
 		})
 		r.conns[db] = conn
+
+		err := redisotel.InstrumentTracing(
+			conn,
+			redisotel.WithAttributes(attribute.Int("db_num", db)),
+		)
+		if err != nil {
+			logger.Default.Error(
+				context.Background(),
+				"error when instrumenting tracing for redis",
+				"db", db,
+				"error", err,
+			)
+		}
 	}
 
 	return conn

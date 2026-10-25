@@ -5,6 +5,7 @@ import (
 	"encoding/json/v2"
 	"fmt"
 
+	"github.com/gofiber/contrib/v3/otel"
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/cors"
 	"github.com/gofiber/fiber/v3/middleware/recover"
@@ -31,6 +32,7 @@ type Fiber struct {
 	CORSAllowCredentials         bool     `env:"FIBER_CORS_ALLOW_CREDENTIALS" envDefault:"false"`
 	CORSDisableValueRedaction    bool     `env:"FIBER_CORS_DISABLE_VALUE_REDUCTION" envDefault:"false"`
 	CORSAllowPrivateNetwork      bool     `env:"FIBER_CORS_ALLOW_PRIVATE_NETWORK" envDefault:"false"`
+	OtelSkipPaths                []string `env:"FIBER_OTEL_SKIP_PATHS" envDefault:"/health,/healthz"`
 }
 
 func (f *Fiber) Init(ctx context.Context) error {
@@ -51,6 +53,16 @@ func (f *Fiber) Init(ctx context.Context) error {
 	if f.UseRecoverMW {
 		f.router.Use(recover.New())
 	}
+
+	otelSkipPaths := make(map[string]struct{}, len(f.OtelSkipPaths))
+	for _, p := range f.OtelSkipPaths {
+		otelSkipPaths[p] = struct{}{}
+	}
+
+	f.router.Use(otel.New(otel.WithNext(func(c fiber.Ctx) bool {
+		_, skip := otelSkipPaths[c.Path()]
+		return skip
+	})))
 
 	if len(f.CORSAllowedOrigins) > 0 {
 		f.router.Use(cors.New(cors.Config{
