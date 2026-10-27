@@ -78,3 +78,43 @@ Returns the underlying Fiber app for route registration.
 1. **Init** — `fiber.New()` is called with config derived from env vars.
 2. **Run** — `fiber.Listen()` starts the server. Blocks until context is cancelled.
 3. **Close** — `fiber.Shutdown()` performs a graceful shutdown.
+
+## OpenTelemetry Support
+
+Instrumentation is active only when `otelcomp.Otel` is registered — without it every provider is no-op. Paths listed in `FIBER_OTEL_SKIP_PATHS` are never traced.
+
+### Trace
+
+One server span per HTTP request, created by the [gofiber otel middleware](https://github.com/gofiber/contrib).
+
+| Span | Kind | What it covers |
+|------|------|----------------|
+| `<METHOD> <route>` | `server` | One per request. The parent is taken from the incoming `traceparent` header |
+
+| Attribute | Example |
+|-----------|---------|
+| `http.request.method` | `GET` |
+| `url.path`, `url.query`, `url.scheme` | `/users`, `page=2`, `https` |
+| `http.route` | `/users/:id` |
+| `http.response.status_code` | `200` |
+| `http.response.body.size` | `2` |
+| `user_agent.original` | `curl/8.23.0` |
+| `client.address` | `10.0.0.7` |
+| `network.protocol.version` | `1.1` |
+| `server.address`, `server.port` | `:3000` |
+| `error.type` | `panic` |
+
+Outgoing requests made with `http.DefaultClient` are traced as client spans by `otelcomp`.
+
+### Metric
+
+Recorded by the same middleware.
+
+| Metric | Type | Unit |
+|--------|------|------|
+| `http.server.request.duration` | histogram | `s` |
+| `http.server.active_requests` | up/down counter | `{request}` |
+| `http.server.request.body.size` | histogram | `By` |
+| `http.server.response.body.size` | histogram | `By` |
+
+All four carry `http.request.method`, `http.route`, `http.response.status_code`, `server.address`, `server.port` and `url.scheme`.

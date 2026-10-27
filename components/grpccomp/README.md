@@ -75,3 +75,36 @@ A logging interceptor is automatically added to both unary and stream chains. It
 1. **Init** — creates the gRPC server with logging interceptors.
 2. **Run** — optionally registers reflection, then starts serving on `GRPC_ADDR`. Blocks until the context is cancelled.
 3. **Close** — `GracefulStop()` stops the server gracefully.
+
+## OpenTelemetry Support
+
+Instrumentation is active only when `otelcomp.Otel` is registered — without it every provider is no-op.
+
+### Trace
+
+One server span per RPC, created by `go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc`, installed as a `grpc.StatsHandler`.
+
+| Span | Kind | What it covers |
+|------|------|----------------|
+| `grpc.health.v1.Health/Check` | `server` | One per RPC. The span name is the full method. Parent taken from the `traceparent` in the call metadata |
+
+| Attribute | Example |
+|-----------|---------|
+| `rpc.system.name` | `grpc` |
+| `rpc.method` | `grpc.health.v1.Health/Check` |
+| `rpc.response.status_code` | `OK` |
+| `server.address`, `server.port` | `:50551` |
+| `network.peer.address`, `network.peer.port` | client address |
+| `error.type` | gRPC status code on failure |
+
+### Metric
+
+Recorded by the same stats handler.
+
+| Metric | Type | Unit |
+|--------|------|------|
+| `rpc.server.call.duration` | histogram | `s` |
+
+Attributes: `rpc.system.name`, `rpc.method`, `rpc.response.status_code`, `server.address`, `server.port`.
+
+Set `OTEL_SEMCONV_STABILITY_OPT_IN=rpc/dup` to also emit the legacy `rpc.server.duration` histogram with the pre-1.37 attribute names (`rpc.system`, `rpc.service`, `rpc.method`, `rpc.grpc.status_code`).

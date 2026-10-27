@@ -137,3 +137,33 @@ The `OTEL_SPAN_*` variable wins over its generic `OTEL_*` fallback. Set a length
 
 1. **Init** — creates the OTLP/HTTP trace, log and metric exporters, builds the shared resource from the standard env variables, installs the global tracer provider, the global logger provider, the global meter provider and the W3C trace-context propagator, then wraps `http.DefaultTransport` for outgoing request tracing.
 2. **Close** — shuts down all three providers so buffered spans, log records and metrics are exported. Uses a fresh 5 second context because the lifecycle context is already canceled at this point.
+
+## OpenTelemetry Support
+
+This component is the one that enables telemetry for the others: it installs the global tracer, logger and meter providers. Nothing is exported unless it is registered, and it must be registered last so its batch flush runs after the other components closed.
+
+| Signal | Provider | Exporter |
+|--------|----------|----------|
+| Trace | `sdktrace.TracerProvider` | `otlptracehttp` |
+| Log | `sdklog.LoggerProvider` | `otlploghttp` |
+| Metric | `sdkmetric.MeterProvider` | `otlpmetrichttp` |
+
+### Trace
+
+| Span | Kind | What it covers |
+|------|------|----------------|
+| `GET`, `POST`, … | `client` | Every request made with `http.DefaultClient`, or any client that did not set its own `Transport`. The outgoing `traceparent` header is injected so downstream services continue the trace |
+
+Attribute set is the standard HTTP client convention: `http.request.method`, `url.full`, `http.response.status_code`, `server.address`, `server.port`, `network.protocol.version`, `error.type`.
+
+Components contribute their own spans on top of this — see the `OpenTelemetry Support` section of each component.
+
+### Metric
+
+| Metric | Type | Unit |
+|--------|------|------|
+| `http.client.request.duration` | histogram | `s` |
+| `http.client.request.body.size` | histogram | `By` |
+| `http.client.response.body.size` | histogram | `By` |
+
+These come from the same `otelhttp` transport. Metrics recorded by components or by `otel.Meter(...)` in application code reach the collector through the meter provider installed here.
