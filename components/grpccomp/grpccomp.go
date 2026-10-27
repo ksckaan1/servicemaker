@@ -6,7 +6,6 @@ import (
 	"net"
 
 	"github.com/ksckaan1/logger"
-	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -27,11 +26,7 @@ func (g *GRPC) Init(ctx context.Context) error {
 	g.unaryServerInterceptors = []grpc.UnaryServerInterceptor{g.loggerMWUnary()}
 	g.streamServerInterceptors = []grpc.StreamServerInterceptor{g.loggerMWStream()}
 
-	opts := []grpc.ServerOption{
-		grpc.StatsHandler(otelgrpc.NewServerHandler()),
-		grpc.ChainUnaryInterceptor(g.unaryServerInterceptors...),
-		grpc.ChainStreamInterceptor(g.streamServerInterceptors...),
-	}
+	opts := g.serverOptions()
 
 	g.server = grpc.NewServer(opts...)
 

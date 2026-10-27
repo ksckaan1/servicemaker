@@ -66,6 +66,10 @@ Adds a unary server interceptor to the chain. Rebuilds the server with the updat
 
 Adds a stream server interceptor to the chain. Rebuilds the server with the updated interceptor chain.
 
+> **Order matters.** Both methods rebuild the server, so anything registered on
+> the previous instance is dropped — including services already registered with
+> `Server()`. Add every interceptor first, then register your services.
+
 ## Built-in Interceptors
 
 A logging interceptor is automatically added to both unary and stream chains. It logs the method name, duration, and any errors for each request.
