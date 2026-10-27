@@ -1,4 +1,4 @@
-# Postgres Component
+# Postgres Component `v0.3.3`
 
 PostgreSQL client component for ServiceMaker, using [pgx/v5](https://github.com/jackc/pgx) connection pool.
 

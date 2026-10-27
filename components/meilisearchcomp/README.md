@@ -1,4 +1,4 @@
-# MeiliSearch Component
+# MeiliSearch Component `v0.3.0`
 
 MeiliSearch client component for ServiceMaker, using [meilisearch-go](https://github.com/meilisearch/meilisearch-go).
 

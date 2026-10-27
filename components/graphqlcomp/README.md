@@ -1,4 +1,4 @@
-# GraphQL Component
+# GraphQL Component `v0.4.1`
 
 GraphQL server component for ServiceMaker, based on [gqlgen](https://github.com/99designs/gqlgen) with a [gofiber/fiber/v3](https://gofiber.io) HTTP transport.
 

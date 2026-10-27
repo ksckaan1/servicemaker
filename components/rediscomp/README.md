@@ -1,4 +1,4 @@
-# Redis Component
+# Redis Component `v0.4.1`
 
 Redis client component for ServiceMaker, using [go-redis/v9](https://github.com/redis/go-redis). Provides per-DB connection pooling with lazy initialization.
 

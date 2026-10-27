@@ -1,4 +1,4 @@
-# gRPC Component
+# gRPC Component `v0.3.3`
 
 gRPC server component for ServiceMaker, using [google.golang.org/grpc](https://github.com/grpc/grpc-go). Includes built-in logging interceptors.
 

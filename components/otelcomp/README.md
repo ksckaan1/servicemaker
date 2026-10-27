@@ -1,4 +1,4 @@
-# OTel Component
+# OTel Component `v0.3.1`
 
 OpenTelemetry observability component for ServiceMaker. Sets up the global tracer, logger and meter providers with OTLP/HTTP exporters, so the instrumentation built into other components (fibercomp, graphqlcomp, pgcomp, rediscomp, grpccomp) starts producing spans and metrics, and logs written through `github.com/ksckaan1/logger` are exported as OTLP log records.
 

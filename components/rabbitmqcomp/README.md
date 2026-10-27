@@ -1,4 +1,4 @@
-# RabbitMQ Component
+# RabbitMQ Component `v0.3.0`
 
 RabbitMQ client component for ServiceMaker, using [amqp091-go](https://github.com/rabbitmq/amqp091-go).
 

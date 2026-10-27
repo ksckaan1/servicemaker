@@ -1,4 +1,4 @@
-# Fiber Component
+# Fiber Component `v0.3.3`
 
 HTTP router component for ServiceMaker, based on [gofiber/fiber/v3](https://gofiber.io).
 
