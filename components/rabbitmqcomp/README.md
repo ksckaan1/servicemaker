@@ -26,7 +26,15 @@ func main() {
 
     rmq := sm.Register[rabbitmqcomp.RabbitMQ]()
 
-    err := rmq.Ch().PublishWithContext(context.Background(),
+    // Each caller needs its own channel: amqp.Channel is not safe for
+    // concurrent use.
+    ch, err := rmq.NewChannel()
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer ch.Close()
+
+    err = ch.PublishWithContext(context.Background(),
         "", "my-queue", false, false,
         amqp.Publishing{ContentType: "text/plain", Body: []byte("hello")},
     )
@@ -53,20 +61,31 @@ RMQ_CONNECTION_STRING=amqp://guest:guest@localhost:5672/ go run main.go
 
 | Interface | Implemented |
 |-----------|-------------|
-| `Initializer` | Yes — dials connection, opens channel, sets QoS |
+| `Initializer` | Yes — dials the connection |
 | `Runner` | No — RabbitMQ has no blocking process |
 | `Closer` | Yes — closes the connection |
-| `HealthChecker` | Yes — checks connection and channel state |
+| `HealthChecker` | Yes — checks the connection state |
 
 ## Methods
 
-### `Ch() *amqp.Channel`
+### `NewChannel() (*amqp.Channel, error)`
 
-Returns the underlying AMQP channel for publishing and consuming.
+Opens a channel on the current connection and applies `RMQ_PREFETCH_COUNT` as
+the QoS prefetch. Call it wherever you publish or consume, and close the
+channel yourself.
+
+Every caller needs its own channel — a single `amqp.Channel` is not safe for
+concurrent use, so sharing one between handlers corrupts the frame stream and
+closes the channel.
+
+If the broker already closed the connection (a restart, or an idle timeout),
+`NewChannel` dials a new one first, so publishes recover without restarting
+the process. Earlier channels on the dead connection do not recover; open a
+new one.
 
 ## Lifecycle
 
-1. **Init** — `amqp.Dial()` connects to the server, opens a channel, and applies QoS settings.
+1. **Init** — `amqp.Dial()` connects to the server.
 2. **Run** — not implemented (returns immediately).
 3. **Close** — closes the AMQP connection (which also closes all channels).
-4. **HealthCheck** — checks if both the connection and channel are still open.
+4. **HealthCheck** — checks if the connection is still open.

@@ -3,14 +3,15 @@ package rabbitmqcomp
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	"github.com/ksckaan1/logger"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 type RabbitMQ struct {
+	mu   sync.Mutex
 	conn *amqp.Connection
-	ch   *amqp.Channel
 
 	// CONFIGS
 	ConnectionString string `env:"RMQ_CONNECTION_STRING,required"`
@@ -18,27 +19,9 @@ type RabbitMQ struct {
 }
 
 func (r *RabbitMQ) Init(ctx context.Context) error {
-	conn, err := amqp.Dial(r.ConnectionString)
-	if err != nil {
-		return fmt.Errorf("amqp.Dial: %w", err)
+	if _, err := r.connection(); err != nil {
+		return err
 	}
-
-	ch, err := conn.Channel()
-	if err != nil {
-		return fmt.Errorf("amqp.Channel: %w", err)
-	}
-
-	err = ch.Qos(
-		r.PrefetchCount,
-		0,
-		false,
-	)
-	if err != nil {
-		return fmt.Errorf("ch.Qos: %w", err)
-	}
-
-	r.conn = conn
-	r.ch = ch
 
 	logger.Default.Info(ctx, "rabbitmq client initialized")
 
@@ -46,7 +29,16 @@ func (r *RabbitMQ) Init(ctx context.Context) error {
 }
 
 func (r *RabbitMQ) Close(ctx context.Context) error {
-	err := r.conn.Close()
+	r.mu.Lock()
+	conn := r.conn
+	r.conn = nil
+	r.mu.Unlock()
+
+	if conn == nil {
+		return nil
+	}
+
+	err := conn.Close()
 	if err != nil {
 		return fmt.Errorf("conn.Close: %w", err)
 	}
@@ -57,17 +49,57 @@ func (r *RabbitMQ) Close(ctx context.Context) error {
 }
 
 func (r *RabbitMQ) HealthCheck(ctx context.Context) error {
-	if r.conn.IsClosed() {
-		return fmt.Errorf("amqp connection is closed")
-	}
+	r.mu.Lock()
+	defer r.mu.Unlock()
 
-	if r.ch.IsClosed() {
-		return fmt.Errorf("amqp channel is closed")
+	if r.conn == nil || r.conn.IsClosed() {
+		return fmt.Errorf("amqp connection is closed")
 	}
 
 	return nil
 }
 
-func (r *RabbitMQ) Ch() *amqp.Channel {
-	return r.ch
+// NewChannel opens a channel on the current connection, reconnecting first if
+// the broker dropped it. Every caller needs its own channel, because
+// amqp.Channel is not safe for concurrent use.
+func (r *RabbitMQ) NewChannel() (*amqp.Channel, error) {
+	conn, err := r.connection()
+	if err != nil {
+		return nil, err
+	}
+
+	ch, err := conn.Channel()
+	if err != nil {
+		return nil, fmt.Errorf("conn.Channel: %w", err)
+	}
+
+	err = ch.Qos(
+		r.PrefetchCount,
+		0,
+		false,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("ch.Qos: %w", err)
+	}
+
+	return ch, nil
+}
+
+// connection returns a live connection, dialing a new one when there is none
+// or the broker already closed it.
+func (r *RabbitMQ) connection() (*amqp.Connection, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	if r.conn != nil && !r.conn.IsClosed() {
+		return r.conn, nil
+	}
+
+	conn, err := amqp.Dial(r.ConnectionString)
+	if err != nil {
+		return nil, fmt.Errorf("amqp.Dial: %w", err)
+	}
+	r.conn = conn
+
+	return conn, nil
 }
