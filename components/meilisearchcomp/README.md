@@ -79,3 +79,35 @@ index := ms.ServiceManager().Index("my-index")
 2. **Run** — not implemented (returns immediately).
 3. **Close** — `ServiceManager.Close()` shuts down the client connection.
 4. **HealthCheck** — `HealthWithContext()` verifies the server is reachable.
+
+## OpenTelemetry Support
+
+Instrumentation is active only when `otelcomp.Otel` is registered — without it every provider is no-op. The Meilisearch client is given a custom `http.Client` whose transport is wrapped with `otelhttp`, so every API call is traced and measured.
+
+### Trace
+
+| Span | Kind | What it covers |
+|------|------|----------------|
+| `GET`, `POST`, `DELETE`, … | `client` | One per HTTP request to Meilisearch |
+
+| Attribute | Example |
+|-----------|---------|
+| `http.request.method` | `GET` |
+| `url.full` | `http://localhost:7700/indexes` |
+| `url.scheme` | `http` |
+| `http.response.status_code` | `200` |
+| `server.address`, `server.port` | `localhost`, `7700` |
+| `network.protocol.version` | `1.1` |
+| `error.type` | on a transport failure |
+
+Retries performed by the Meilisearch client produce one span each.
+
+### Metric
+
+| Metric | Type | Unit |
+|--------|------|------|
+| `http.client.request.duration` | histogram | `s` |
+| `http.client.request.body.size` | histogram | `By` |
+| `http.client.response.body.size` | histogram | `By` |
+
+Attributes: `http.request.method`, `http.response.status_code`, `server.address`, `server.port`, `url.scheme`.
