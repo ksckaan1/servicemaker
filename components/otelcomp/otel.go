@@ -10,21 +10,24 @@ import (
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploghttp"
+	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 	"go.opentelemetry.io/otel/log/global"
 	"go.opentelemetry.io/otel/propagation"
 	sdklog "go.opentelemetry.io/otel/sdk/log"
+	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.43.0"
 )
 
-// Otel configures the global tracer and logger providers. Register it last so
-// its batch flush runs after the other components have closed and ended their
-// spans and written their final logs.
+// Otel configures the global tracer, logger and meter providers. Register it
+// last so its batch flush runs after the other components have closed and
+// ended their spans, written their final logs and recorded their metrics.
 type Otel struct {
 	tp *sdktrace.TracerProvider
 	lp *sdklog.LoggerProvider
+	mp *sdkmetric.MeterProvider
 
 	// CONFIGS
 	ServiceName string `env:"OTEL_SERVICE_NAME"`
@@ -39,6 +42,11 @@ func (o *Otel) Init(ctx context.Context) error {
 	logExp, err := otlploghttp.New(ctx)
 	if err != nil {
 		return fmt.Errorf("otlploghttp.New: %w", err)
+	}
+
+	metricExp, err := otlpmetrichttp.New(ctx)
+	if err != nil {
+		return fmt.Errorf("otlpmetrichttp.New: %w", err)
 	}
 
 	serviceName := o.ServiceName
@@ -66,8 +74,14 @@ func (o *Otel) Init(ctx context.Context) error {
 		sdklog.WithResource(res),
 	)
 
+	o.mp = sdkmetric.NewMeterProvider(
+		sdkmetric.WithReader(sdkmetric.NewPeriodicReader(metricExp)),
+		sdkmetric.WithResource(res),
+	)
+
 	otel.SetTracerProvider(o.tp)
 	global.SetLoggerProvider(o.lp)
+	otel.SetMeterProvider(o.mp)
 	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(
 		propagation.TraceContext{}, propagation.Baggage{},
 	))
@@ -79,8 +93,8 @@ func (o *Otel) Init(ctx context.Context) error {
 	return nil
 }
 
-// Close flushes buffered spans and logs. The lifecycle context is already
-// canceled by the time closers run, so a fresh context is required.
+// Close flushes buffered spans, logs and metrics. The lifecycle context is
+// already canceled by the time closers run, so a fresh context is required.
 func (o *Otel) Close(context.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -88,5 +102,6 @@ func (o *Otel) Close(context.Context) error {
 	return errors.Join(
 		o.tp.Shutdown(ctx),
 		o.lp.Shutdown(ctx),
+		o.mp.Shutdown(ctx),
 	)
 }

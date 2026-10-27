@@ -142,6 +142,59 @@ func restoreTransport(t *testing.T) {
 	t.Cleanup(func() { http.DefaultTransport = orig })
 }
 
+// Verifies that metrics recorded through the global meter provider are
+// exported to the OTLP endpoint on Shutdown.
+func TestCloseFlushesMetrics(t *testing.T) {
+	restoreTransport(t)
+
+	metricBodies := make(chan string, 8)
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/v1/metrics" {
+			body, _ := io.ReadAll(r.Body)
+			metricBodies <- string(body)
+		}
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer srv.Close()
+
+	t.Setenv("OTEL_EXPORTER_OTLP_ENDPOINT", srv.URL)
+	t.Setenv("OTEL_SERVICE_NAME", "otelcomp-metrics-test")
+
+	o := &Otel{}
+	if err := o.Init(context.Background()); err != nil {
+		t.Fatalf("Init: %v", err)
+	}
+
+	counter, err := otel.Meter("test").Int64Counter("test.counter")
+	if err != nil {
+		t.Fatalf("Int64Counter: %v", err)
+	}
+	counter.Add(context.Background(), 7)
+
+	select {
+	case <-metricBodies:
+		t.Fatal("metrics exported before Close")
+	default:
+	}
+
+	if err := o.Close(context.Background()); err != nil {
+		t.Fatalf("Close: %v", err)
+	}
+
+	select {
+	case body := <-metricBodies:
+		if !strings.Contains(body, "test.counter") {
+			t.Fatalf("exported metrics do not contain the instrument name: %q", body)
+		}
+		if !strings.Contains(body, "otelcomp-metrics-test") {
+			t.Fatalf("exported metrics do not contain the service name: %q", body)
+		}
+	default:
+		t.Fatal("Close did not flush metrics")
+	}
+}
+
 // Verifies that documented OTEL_TRACES_SAMPLER values are honoured by the SDK.
 func TestSamplerEnvIsHonoured(t *testing.T) {
 	restoreTransport(t)
