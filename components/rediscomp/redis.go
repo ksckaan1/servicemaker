@@ -3,6 +3,7 @@ package rediscomp
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	"github.com/ksckaan1/logger"
 	"github.com/redis/go-redis/extra/redisotel/v9"
@@ -11,6 +12,7 @@ import (
 )
 
 type Redis struct {
+	mu    sync.Mutex
 	conns map[int]*redis.Client
 
 	// CONFIGS
@@ -29,7 +31,7 @@ func (r *Redis) Init(ctx context.Context) error {
 }
 
 func (r *Redis) Close(ctx context.Context) error {
-	for _, conn := range r.conns {
+	for _, conn := range r.clients() {
 		err := conn.Close()
 		if err != nil {
 			logger.Default.Error(
@@ -47,7 +49,7 @@ func (r *Redis) Close(ctx context.Context) error {
 }
 
 func (r *Redis) HealthCheck(ctx context.Context) error {
-	for _, conn := range r.conns {
+	for _, conn := range r.clients() {
 		_, err := conn.Ping(ctx).Result()
 		if err != nil {
 			return fmt.Errorf("error when sending ping to redis connection (%d): %w", conn.Options().DB, err)
@@ -56,43 +58,60 @@ func (r *Redis) HealthCheck(ctx context.Context) error {
 	return nil
 }
 
+// clients returns a snapshot of the open clients, so callers never hold the
+// lock across network calls.
+func (r *Redis) clients() []*redis.Client {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	conns := make([]*redis.Client, 0, len(r.conns))
+	for _, conn := range r.conns {
+		conns = append(conns, conn)
+	}
+	return conns
+}
+
 func (r *Redis) DB(db int) *redis.Client {
-	conn, ok := r.conns[db]
-	if !ok {
-		conn = redis.NewClient(&redis.Options{
-			Addr:       r.Addr,
-			ClientName: r.ClientName,
-			Username:   r.User,
-			Password:   r.Pass,
-			DB:         db,
-		})
-		r.conns[db] = conn
+	r.mu.Lock()
+	defer r.mu.Unlock()
 
-		err := redisotel.InstrumentTracing(
-			conn,
-			redisotel.WithAttributes(attribute.Int("db_num", db)),
-		)
-		if err != nil {
-			logger.Default.Error(
-				context.Background(),
-				"error when instrumenting tracing for redis",
-				"db", db,
-				"error", err,
-			)
-		}
+	if conn, ok := r.conns[db]; ok {
+		return conn
+	}
 
-		err = redisotel.InstrumentMetrics(
-			conn,
-			redisotel.WithAttributes(attribute.Int("db_num", db)),
+	conn := redis.NewClient(&redis.Options{
+		Addr:       r.Addr,
+		ClientName: r.ClientName,
+		Username:   r.User,
+		Password:   r.Pass,
+		DB:         db,
+	})
+	r.conns[db] = conn
+
+	err := redisotel.InstrumentTracing(
+		conn,
+		redisotel.WithAttributes(attribute.Int("db_num", db)),
+	)
+	if err != nil {
+		logger.Default.Error(
+			context.Background(),
+			"error when instrumenting tracing for redis",
+			"db", db,
+			"error", err,
 		)
-		if err != nil {
-			logger.Default.Error(
-				context.Background(),
-				"error when instrumenting metrics for redis",
-				"db", db,
-				"error", err,
-			)
-		}
+	}
+
+	err = redisotel.InstrumentMetrics(
+		conn,
+		redisotel.WithAttributes(attribute.Int("db_num", db)),
+	)
+	if err != nil {
+		logger.Default.Error(
+			context.Background(),
+			"error when instrumenting metrics for redis",
+			"db", db,
+			"error", err,
+		)
 	}
 
 	return conn
