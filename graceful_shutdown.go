@@ -10,11 +10,9 @@ import (
 func (s *ServiceMaker) gracefulShutdown(ctx context.Context) context.Context {
 	gCtx, cancel := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM)
 
-	go func() {
-		<-gCtx.Done()
-		defer cancel()
-		close(s.shutdownCh)
-	}()
+	// Release the signal registration once the context is done.
+	context.AfterFunc(gCtx, cancel)
+
 	return gCtx
 }
 

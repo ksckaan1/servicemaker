@@ -278,7 +278,7 @@ ServiceMaker uses [caarlos0/env](https://github.com/caarlos0/env) for parsing. C
 ```
 Register[T]()  → parse env config → Init(ctx) → (ready)    returns *T
 Run()          → Runner.Run(ctx) concurrently (errgroup)
-SIGINT/SIGTERM → shutdownCh closes → Close(ctx) in order → Run() returns nil
+SIGINT/SIGTERM → context canceled → Close(ctx) in order → Run() returns nil
 Component error → Close(ctx) in order → Run() returns error
 ```
 

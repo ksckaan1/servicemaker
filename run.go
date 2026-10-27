@@ -24,6 +24,9 @@ func (s *ServiceMaker) Run() error {
 			}()
 			select {
 			case err := <-done:
+				if err == nil {
+					return nil
+				}
 				return fmt.Errorf("(%T).Run: %w", comp, err)
 			case <-ctx.Done():
 				return ctx.Err()
@@ -38,11 +41,12 @@ func (s *ServiceMaker) Run() error {
 	s.closeAll()
 	s.closerWg.Wait()
 
-	select {
-	case <-s.shutdownCh:
+	// gCtx is done on SIGINT/SIGTERM or when the caller canceled its context:
+	// that is a graceful shutdown, not a failure.
+	if s.gCtx.Err() != nil {
 		logger.Default.Info(context.Background(), "graceful shutdown completed")
 		return nil
-	default:
-		return err
 	}
+
+	return err
 }

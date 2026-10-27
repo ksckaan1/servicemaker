@@ -40,8 +40,8 @@ All component config is parsed from environment variables using `caarlos0/env/v1
 ## Shutdown flow
 
 1. Signal handler listens for `SIGINT`/`SIGTERM`
-2. On signal: closes `shutdownCh`, cancels context
-3. `Run()` detects shutdown, calls `closeAll()` with `context.Background()`
+2. On signal: the lifecycle context is canceled
+3. `Run()` detects the canceled context and calls `closeAll()` with a 10 second timeout budget
 4. All `Closer` implementations are called in registration order
 5. `Run()` returns `nil` (graceful) or component error
 
