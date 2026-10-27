@@ -124,6 +124,8 @@ func (f *GraphQL) RegisterServer(endpoint string, server *handler.Server) {
 		server.Use(extension.Introspection{})
 	}
 
+	server.Use(otelExtension{})
+
 	f.router.All(endpoint, adaptor.HTTPHandler(server))
 
 	if f.Playground {

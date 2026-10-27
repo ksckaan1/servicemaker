@@ -91,3 +91,38 @@ gql.RegisterServer("/graphql", srv)
 1. **Init** — `fiber.New()` is called with config derived from env vars.
 2. **Run** — `fiber.Listen()` starts the server. Blocks until context is cancelled.
 3. **Close** — `fiber.Shutdown()` performs a graceful shutdown.
+
+## OpenTelemetry Support
+
+Instrumentation is active only when `otelcomp.Otel` is registered — without it every provider is no-op. Paths listed in `GQL_OTEL_SKIP_PATHS` are never traced.
+
+### Trace
+
+Two levels of spans per request.
+
+| Span | Kind | What it covers |
+|------|------|----------------|
+| `<METHOD> <route>` | `server` | The HTTP transport, from the [gofiber otel middleware](https://github.com/gofiber/contrib). Parent taken from the incoming `traceparent` header |
+| `graphql.operation` | `server` | One per GraphQL operation, nested under the HTTP span. Created by the component's own gqlgen extension |
+
+Transport span attributes: `http.request.method`, `url.path`, `http.route`, `http.response.status_code`, `user_agent.original`, `client.address`, `network.protocol.version`, `server.address`, `server.port`.
+
+| `graphql.operation` attribute | Example |
+|------------------------------|---------|
+| `graphql.operation.name` | `GetUser` (falls back to `anonymous` for unnamed operations) |
+| `graphql.operation.type` | `query`, `mutation`, `subscription` |
+
+GraphQL errors are attached with `span.RecordError()` and set the span status to `Error` using the first error message. For subscriptions the operation span stays open until the stream ends.
+
+Outgoing requests made with `http.DefaultClient` are traced as client spans by `otelcomp`.
+
+### Metric
+
+Only HTTP server metrics are produced; there are no GraphQL-specific instruments.
+
+| Metric | Type | Unit |
+|--------|------|------|
+| `http.server.request.duration` | histogram | `s` |
+| `http.server.active_requests` | up/down counter | `{request}` |
+| `http.server.request.body.size` | histogram | `By` |
+| `http.server.response.body.size` | histogram | `By` |
