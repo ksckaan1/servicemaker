@@ -2,7 +2,7 @@
 	<img src="./img/logo.png" alt="ServiceMaker">
 </center>
 
-# ServiceMaker `v0.3.4`
+# ServiceMaker `v0.4.0`
 
 A Go library that orchestrates the lifecycle of application components (init, run, close, health check). Component configuration is read from environment variables.
 
@@ -157,12 +157,12 @@ Each component is a standalone Go module. Import only the ones you need.
 
 | Package                      | Description                                                                          | Version  | Trace | Metric | Docs                                           |
 | ---------------------------- | ------------------------------------------------------------------------------------ | -------- | :---: | :----: | ---------------------------------------------- |
-| `components/fibercomp`       | HTTP router ([gofiber/fiber/v3](https://gofiber.io))                                 | `v0.3.2` |  ✅   |   ✅   | [README](components/fibercomp/README.md)       |
-| `components/rediscomp`       | Redis client ([go-redis/v9](https://github.com/redis/go-redis))                      | `v0.4.0` |  ✅   |   ✅   | [README](components/rediscomp/README.md)       |
-| `components/pgcomp`          | PostgreSQL client ([pgx/v5](https://github.com/jackc/pgx))                           | `v0.3.2` |  ✅   |   ✅   | [README](components/pgcomp/README.md)          |
-| `components/rabbitmqcomp`    | RabbitMQ client ([amqp091-go](https://github.com/rabbitmq/amqp091-go))               | `v0.2.2` |  ❌   |   ❌   | [README](components/rabbitmqcomp/README.md)    |
-| `components/grpccomp`        | gRPC server ([grpc-go](https://github.com/grpc/grpc-go))                             | `v0.3.2` |  ✅   |   ✅   | [README](components/grpccomp/README.md)        |
-| `components/graphqlcomp`     | GraphQL server ([gqlgen](https://github.com/99designs/gqlgen))                       | `v0.4.0` |  ✅   |   ✅   | [README](components/graphqlcomp/README.md)     |
+| `components/fibercomp`       | HTTP router ([gofiber/fiber/v3](https://gofiber.io))                                 | `v0.3.3` |  ✅   |   ✅   | [README](components/fibercomp/README.md)       |
+| `components/rediscomp`       | Redis client ([go-redis/v9](https://github.com/redis/go-redis))                      | `v0.4.1` |  ✅   |   ✅   | [README](components/rediscomp/README.md)       |
+| `components/pgcomp`          | PostgreSQL client ([pgx/v5](https://github.com/jackc/pgx))                           | `v0.3.3` |  ✅   |   ✅   | [README](components/pgcomp/README.md)          |
+| `components/rabbitmqcomp`    | RabbitMQ client ([amqp091-go](https://github.com/rabbitmq/amqp091-go))               | `v0.3.0` |  ❌   |   ❌   | [README](components/rabbitmqcomp/README.md)    |
+| `components/grpccomp`        | gRPC server ([grpc-go](https://github.com/grpc/grpc-go))                             | `v0.3.3` |  ✅   |   ✅   | [README](components/grpccomp/README.md)        |
+| `components/graphqlcomp`     | GraphQL server ([gqlgen](https://github.com/99designs/gqlgen))                       | `v0.4.1` |  ✅   |   ✅   | [README](components/graphqlcomp/README.md)     |
 | `components/meilisearchcomp` | MeiliSearch client ([meilisearch-go](https://github.com/meilisearch/meilisearch-go)) | `v0.3.0` |  ✅   |   ✅   | [README](components/meilisearchcomp/README.md) |
 | `components/otelcomp`        | OpenTelemetry setup ([OTLP](https://opentelemetry.io))                               | `v0.3.1` |  ✅   |   ✅   | [README](components/otelcomp/README.md)        |
 
