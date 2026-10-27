@@ -6,6 +6,24 @@
 
 A Go library that orchestrates the lifecycle of application components (init, run, close, health check). Component configuration is read from environment variables.
 
+## Table of Contents
+
+- [How it works](#how-it-works)
+- [API](#api)
+- [Getting Started](#getting-started)
+  - [Quick Start](#quick-start)
+  - [Multiple Components](#multiple-components)
+  - [Named Components](#named-components)
+- [Pre-built Components](#pre-built-components)
+- [Custom Components](#custom-components)
+  - [Interfaces](#interfaces)
+  - [Minimal Component (Init only)](#minimal-component-init-only)
+  - [Full Lifecycle Component](#full-lifecycle-component)
+  - [Config Tag Reference](#config-tag-reference)
+- [Component State Machine](#component-state-machine)
+- [Installation](#installation)
+- [License](#license)
+
 ## How it works
 
 An application typically consists of multiple independent components: an HTTP server, a database connection, Redis, etc. Each component follows a similar lifecycle:
@@ -137,16 +155,18 @@ CACHE_REDIS_ADDR=localhost:6379 QUEUE_REDIS_ADDR=localhost:6380 go run main.go
 
 Each component is a standalone Go module. Import only the ones you need.
 
-| Package                   | Description                                                            | Docs                                        |
-| ------------------------- | ---------------------------------------------------------------------- | ------------------------------------------- |
-| `components/fibercomp`    | HTTP router ([gofiber/fiber/v3](https://gofiber.io))                   | [README](components/fibercomp/README.md)    |
-| `components/rediscomp`    | Redis client ([go-redis/v9](https://github.com/redis/go-redis))        | [README](components/rediscomp/README.md)    |
-| `components/pgcomp`       | PostgreSQL client ([pgx/v5](https://github.com/jackc/pgx))             | [README](components/pgcomp/README.md)       |
-| `components/rabbitmqcomp` | RabbitMQ client ([amqp091-go](https://github.com/rabbitmq/amqp091-go)) | [README](components/rabbitmqcomp/README.md) |
-| `components/grpccomp`     | gRPC server ([grpc-go](https://github.com/grpc/grpc-go))               | [README](components/grpccomp/README.md)     |
-| `components/graphqlcomp`  | GraphQL server ([gqlgen](https://github.com/99designs/gqlgen))          | [README](components/graphqlcomp/README.md)  |
-| `components/meilisearchcomp` | MeiliSearch client ([meilisearch-go](https://github.com/meilisearch/meilisearch-go)) | [README](components/meilisearchcomp/README.md) |
-| `components/otelcomp`     | OpenTelemetry tracing ([OTLP](https://opentelemetry.io))               | [README](components/otelcomp/README.md)     |
+| Package                   | Description                                                            | Version | Trace | Metric | Docs                                        |
+| ------------------------- | ---------------------------------------------------------------------- | ------- | :---: | :----: | ------------------------------------------- |
+| `components/fibercomp`    | HTTP router ([gofiber/fiber/v3](https://gofiber.io))                   | `v0.3.2` | ✅ | ✅ | [README](components/fibercomp/README.md)    |
+| `components/rediscomp`    | Redis client ([go-redis/v9](https://github.com/redis/go-redis))        | `v0.4.0` | ✅ | ✅ | [README](components/rediscomp/README.md)    |
+| `components/pgcomp`       | PostgreSQL client ([pgx/v5](https://github.com/jackc/pgx))             | `v0.3.2` | ✅ | ✅ | [README](components/pgcomp/README.md)       |
+| `components/rabbitmqcomp` | RabbitMQ client ([amqp091-go](https://github.com/rabbitmq/amqp091-go)) | `v0.2.2` | ❌ | ❌ | [README](components/rabbitmqcomp/README.md) |
+| `components/grpccomp`     | gRPC server ([grpc-go](https://github.com/grpc/grpc-go))               | `v0.3.2` | ✅ | ✅ | [README](components/grpccomp/README.md)     |
+| `components/graphqlcomp`  | GraphQL server ([gqlgen](https://github.com/99designs/gqlgen))          | `v0.4.0` | ✅ | ✅ | [README](components/graphqlcomp/README.md)  |
+| `components/meilisearchcomp` | MeiliSearch client ([meilisearch-go](https://github.com/meilisearch/meilisearch-go)) | `v0.3.0` | ✅ | ✅ | [README](components/meilisearchcomp/README.md) |
+| `components/otelcomp`     | OpenTelemetry setup ([OTLP](https://opentelemetry.io))                  | `v0.3.1` | ✅ | ✅ | [README](components/otelcomp/README.md)     |
+
+Telemetry only flows when `otelcomp` is registered — the other components then instrument themselves automatically. Logs are exported as well, through the same component. See the [otelcomp README](components/otelcomp/README.md) for the accepted environment variables.
 
 ## Custom Components
 
