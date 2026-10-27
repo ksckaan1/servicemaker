@@ -21,6 +21,7 @@ func (p *Postgres) Migrate(ctx context.Context, fsys fs.FS, path string) error {
 	if err != nil {
 		return fmt.Errorf("migrate.NewWithSourceInstance: %w", err)
 	}
+	defer migrator.Close()
 
 	err = migrator.Up()
 	if err != nil {
