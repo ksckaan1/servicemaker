@@ -11,12 +11,9 @@ import (
 func (f *Fiber) restLoggerMW(ctx fiber.Ctx) error {
 	start := time.Now()
 
+	// Fiber already routes a returned error to ErrorHandler itself, so this
+	// middleware only observes it.
 	chainErr := ctx.Next()
-	if chainErr != nil {
-		if err := ctx.App().ErrorHandler(ctx, chainErr); err != nil {
-			_ = ctx.SendStatus(fiber.StatusInternalServerError)
-		}
-	}
 
 	if ctx.GetRespHeader("Content-Type") == "text/event-stream" /* SSE */ ||
 		ctx.Response().StatusCode() == 101 /* WebSocket */ {
