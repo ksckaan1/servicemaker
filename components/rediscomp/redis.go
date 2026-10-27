@@ -80,6 +80,19 @@ func (r *Redis) DB(db int) *redis.Client {
 				"error", err,
 			)
 		}
+
+		err = redisotel.InstrumentMetrics(
+			conn,
+			redisotel.WithAttributes(attribute.Int("db_num", db)),
+		)
+		if err != nil {
+			logger.Default.Error(
+				context.Background(),
+				"error when instrumenting metrics for redis",
+				"db", db,
+				"error", err,
+			)
+		}
 	}
 
 	return conn
